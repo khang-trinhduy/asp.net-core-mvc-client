@@ -1,0 +1,46 @@
+﻿@model IEnumerable<RequestTemplate.Models.Request>
+
+@{
+    ViewData["Title"] = "Danh sách workflow";
+}
+
+<h1>Danh sách workflow</h1>
+
+<div class="create">
+    <a asp-action="Create">Tạo workflow</a>
+</div>
+
+<div class="flow-main-page">
+    <div class="select-flow-page">
+        <div id="flow-list">
+            <select id="flows" class="custom-select" asp-items="@ViewBag.flows">
+                <option value="">Chọn</option>
+            </select>
+        </div>
+        <div id="select-flow">
+            <input id="btn-select-flow" type="button" value="Ok"/>
+        </div>
+    </div>
+    <div class="flow-page">
+        <div class="progressing-page">
+        </div>
+    </div>
+    <div class="task-page">
+
+    </div>
+</div>
+
+<script>
+    $('#btn-select-flow').on('click', function(){
+        if($('#flows').val() != '')
+        {
+            var url = '@Url.Action("ChangeRequest", "Requests")' + "?id=" + $('#flows').val();
+            $('.progressing-page').load(url, function(){
+                console.log("It worked");
+                $('.progressing-page').fadeIn('slow');
+            });
+
+
+        }
+    });
+</script>
