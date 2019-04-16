@@ -49,6 +49,8 @@ namespace RequestTemplate.Controllers
             return View(data);
         }
 
+
+
         [HttpGet]
         public async Task<IActionResult> ChangeRequest(int? id)
         {
@@ -242,7 +244,6 @@ namespace RequestTemplate.Controllers
             var client = new HttpClient();
             var content = new StringContent(JsonConvert.SerializeObject(new_request), Encoding.UTF8, "application/json");
             var result = await client.PostAsync("http://" + Configuration["url"] + ":88/api/v1/requests/", content);
-            // var result = await client.PostAsync("http://localhost:5011/api/v1/requests/", content);
             if (!result.IsSuccessStatusCode)
             {
                 return Json("Lỗi: không tìm thấy máy chủ");

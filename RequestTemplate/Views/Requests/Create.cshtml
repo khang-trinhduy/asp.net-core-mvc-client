@@ -35,18 +35,95 @@
         </div>
     </div>
 </div>
+<hr/>
+<div class="progress-page">
+    <label class="control-label">Sơ đồ</label>
+    <div class="progress-area">
+        
+    </div>
+</div>
+<div class="transition-page">
+    <div class="transition-area">
+        
+    </div>
+</div>
 <div class="submit-work-flow">
+    <button class="btn btn-warning" id="btn-graph">Tạo sơ đồ</button>
+    <button class="btn btn-info" id="btn-condition">Thêm điều kiện</button>
     <button id="btn-submit" class="btn btn-default">Lưu lại</button>
 </div>
 <style>
     .far, .fas{
         margin-left: 10px;
     }
+        select {
+            width: auto !important;
+        }
 </style>
 
 <script>
     var ids = [];
     var curId = 0;
+    var activities = [];
+    var actions = ['approve', 'deny'];
+    var cdt = 1;
+    function generate_path() {
+        $('.progress-area').html('');
+        
+        for (let i = 0; i < ids.length; i++) {
+            const cur = ids[i];
+            var next = cur + 1;
+            var activity = {};
+            activity['name'] = $('#activity-name' + cur.toString()).val();
+            var elem = '<select onchange="change(this,' + (i + 1).toString() +')" style="display: inline-block" class="form-control" id="state-graph' + (i + 1).toString() + '">';
+           
+            for (let j = 0; j < ids.length; j++) {
+                const ai = ids[j];
+                var name = $('#activity-name' + ai.toString()).val();
+                elem += '<option value="' + name + '">' + name + '</option>';
+                
+            }
+            elem += '</select>';
+            if (i < ids.length - 1) {
+                elem += '<div style="display:inline-block" class="path">'+
+                            '<p style="display:inline-block">-></p>' + 
+                        '</div>';
+            }
+            if (!activities.includes(activity.name)) {
+                activities.push(activity.name);
+            }
+            $('.progress-area').append(elem);
+        }
+    }
+    function default_condition(params) {
+        var new_elem = '<label style="display: inline-block" class="control-label">Điều kiện mặc định: </label>'
+            + '<ul class="list-group">';
+        for (let i = 0; i < params.length; i++) {
+            if (i < params.length - 1) {
+                new_elem += '<li class="list-group-item disabled">Nếu ' + params[i] + ' chọn approve thì chuyến đến ' + params[i+1] + '</li>';
+            }
+            else {
+                new_elem += '<li class="list-group-item disabled">Nếu ' + params[i] + ' chọn approve thì kết thúc quy trình</li>';
+            }
+        }
+        new_elem += '</ul>';
+        $('.transition-area').append(new_elem);
+    }
+    function change(item, params) {
+        for (let i = 0; i < ids.length; i++) {
+            const cur = ids[i];
+            if(cur != params) {
+                $('#state-graph' + cur.toString() + ' option').each(function () { 
+                     if ($(this).val() == item.value) {
+                         $(this).remove();
+                     }
+                });
+            }
+        }
+    }
+    $('.select-group>select').change(function (e) { 
+        console.log($('#state-graph' + e.toString()).value);
+    });
     function createstate(id, type) {  
         var state_view = '<div class="state-header">' +
             '<div class="state-name' + id +'">' +
@@ -128,6 +205,47 @@
         state_view += '</div>';
         return state_view;
     }
+
+    $('#btn-graph').click(function (params) {
+        generate_path();
+    });
+
+    $('#btn-condition').click(function (params) {
+        if (cdt == 1) {
+            temp_activities = [];
+            for (let i = 0; i < ids.length; i++) {
+
+                var activity = $('#state-graph' + ids[i].toString()).val();
+                temp_activities.push(activity);
+            }
+            default_condition(temp_activities);
+        }
+        add_transition(cdt);
+        cdt++;
+    });
+
+    function add_transition(i) {
+        var elem = '';
+        elem += '<div><label style="display:inline-block" class="control-label">Nếu' +
+        '<select style="display: inline-block" class="form-control" id="select-cond' + i + '">';
+        activities.forEach(activity => {
+            elem += '<option value="' + activity + '">' + activity +'</option>';
+        });
+        elem += '</select>' +
+        'chọn <select style="display: inline-block" class="form-control" id="select-acti' + i + '">' ;
+        actions.forEach(action => {
+            elem += '<option value="' + action + '">' + action +'</option>';
+        });
+        elem += '</select>' +
+        'thì đi đến' +
+        '<select style="display: inline-block" class="form-control" id="select-answ' + i + '">';
+        activities.forEach(activity => {
+            elem += '<option value="' + activity + '">' + activity +'</option>';
+        });
+        elem +='</select></label></div>';
+        $('.transition-area').append(elem);
+    }
+
     function toggling(self) {
         $(self).next('input').slideToggle();
     }
@@ -213,9 +331,43 @@
         $('.states-partial').append(createstate(curId + 1, $(this).attr('id').toUpperCase()));
         $('#activity-desc' + (curId + 1).toString()).slideToggle();
         $('#activity-dura' + (curId + 1).toString()).slideToggle();
-        ids.push(0);
+        ids.push(curId + 1);
         curId++;
     }); 
+
+    function get_rule() {
+        rules = {};
+        rules['paths'] = [];
+        rules['states'] = {};
+        states = {};
+        for (let i = 0; i < ids.length; i++) {
+            const cur = ids[i];
+            rule = {};
+            var activity = $('#state-graph' + cur.toString()).val();
+            if (i < ids.length - 1)
+            {
+                
+                if (activity == undefined) {
+                    return null;
+                }
+                rule['currentstate'] = activity;
+                var next = cur + 1;
+                rule['nextstate'] = $('#state-graph' + next.toString()).val();
+                rule['action'] = 'approve';
+                rules.paths.push(rule);
+            }
+            
+            if (i == 0)
+            {
+                rules.states['start'] = activity;
+            }
+            else if (i == ids.length - 1)
+            {
+                rules.states['end'] = activity;
+            }
+        }
+        return rules;
+    }
 
     $('#btn-submit').on('click', function (params) {
         var request = {};
@@ -232,6 +384,17 @@
         request['process']['rules'] = [];
         request['process']['activities'] = [];
         var idns = document.querySelectorAll('[id]');
+        var rules = null;
+        var manual = $('#manual-proceed').is(':checked');
+        if (manual) {
+            rules = get_rule();
+            console.log(rules);
+        }
+        if (rules == null && manual)
+        {
+            alert("Chưa tạo sơ đồ");
+            return;
+        }
         for (let i = 1; i <= ids.length; i++) {
             state = {};
             activity = {};
@@ -255,24 +418,42 @@
             state['eta'] = $('#state-eta' + i.toString()).val();
             state['activities'] = [];
             state['activities'].push(activity);
-            if(i == 1)
-            {
-                state['statetype'] = 'start';
-            }
-            else if(i == ids.length)
-            {
-                state['statetype'] = 'end';                
-            }
-            else
-            {
-                state['statetype'] = 'normal';   
-            }
             states.push(state.name);
-
             
+            if (!manual) {
+                activities.push(activity.name);
+                if(i == 1)
+                {
+                    state['statetype'] = 'start';
+                }
+                else if(i == ids.length)
+                {
+                    state['statetype'] = 'end';                
+                }
+                else
+                {
+                    state['statetype'] = 'normal';   
+                }
+            }
+            else {
+                if(rules.states.start == state.name)
+                {
+                    state['statetype'] = 'start';
+                }
+                else if(rules.states.end == state.name)
+                {
+                    state['statetype'] = 'end';                
+                }
+                else
+                {
+                    state['statetype'] = 'normal';   
+                }
+            }
+
             request['process']['states'].push(state);
         }
-        if ($('#auto-proceed').is(':checked')) {
+        
+        if (!manual) {
             request['process']['actions'] = ['auto'];
             for (let index = 0; index < states.length - 1; index++) {
                 var rule = {'action': 'auto advance', 'currentstate': states[index], 'nextstate': states[index + 1]};
@@ -280,18 +461,37 @@
             }
         }
         else{
-            var action = {'name': 'approve'};
-            var another_action = {'name': 'deny'};
-            request['process']['actions'].push(action);
-            request['process']['actions'].push(another_action);
-            for (let index = 0; index < states.length - 1; index++) {
-                var rule = {'action': 'approve', 'currentstate': states[index], 'nextstate': states[index + 1]};
-                var another_rule = {'action': 'deny', 'currentstate': states[index], 'nextstate': states[index + 1]};
-                request['process']['rules'].push(rule);
-                request['process']['rules'].push(another_rule);
+            rules.paths.forEach(path => {
+                if (!actions.includes(path.action)) {
+                    actions.push(path.action);
+                    
+                }
+                request['process']['rules'].push(path);
+                
+            });
+            if (cdt > 1) {
+                for (let i = 1; i < cdt; i++) {
+                    var another_rule = {};
+                    another_rule['action'] = $('#select-acti' + i.toString()).val();                     
+                    another_rule['currentstate'] = $('#select-cond' + i.toString()).val();                     
+                    another_rule['nextstate'] = $('#select-answ' + i.toString()).val();    
+                    var is_not_duplicated = true;
+                    for (let index = 0; index < request['process']['rules'].length; index++) {
+                        const rule = request['process']['rules'][index];
+                        if (rule.action == another_rule.action || rule.currentstate == another_rule.currentstate || rule.nextstate == another_rule.nextstate) {
+                            is_not_duplicated = false;
+                        }
+                    }
+                    if (!is_not_duplicated) {
+                        request['process']['rules'].push(another_rule);                 
+                    }
+                }
             }
         }
-        request['currentstate'] = states[0];
+        actions.forEach(action => {
+            request['process']['actions'].push({'name': action}) ;
+        });
+        request['currentstate'] = request.process.states[request.process.states.findIndex(i => i.statetype === 'start')].name;
         console.log(request);
         $.ajax({
             type: "post",

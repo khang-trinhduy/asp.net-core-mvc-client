@@ -160,7 +160,7 @@
         return is_not_really_completed;
     }
 
-    function complete_task(id) {
+    function complete_task(id, action) {
         tasks.forEach(task => {
             if (task.activity.id == id) {
                 var url = '@Url.Action("completetask", "requests")';
@@ -195,15 +195,19 @@
                 var core_data = {"datatype": "TalentLeave", "absentname": $('#activity-abse' + id.toString()).text(), "approvername": $('#activity-appr' + id.toString()).val(), "dayoff": $('#activity-dayo' + id.toString()).text(), "reason": $('#activity-reas' + id.toString()).text(), "isdone": true, "isreallynotapproved": isreallynotapproved};
                 var extra = {"datatype": "Comment", "messages": $('#activity-data' + id.toString()).val(), "emoji": "", "topic": "TL_AC"};
                 var activity_data = []
-                activity_data.push(core_data);
-                activity_data.push(extra);
+                if (core_data.approvername != undefined && core_data.absentname != '') {
+                    activity_data.push(core_data);
+                }
+                if (extra.messages != '') {
+                    activity_data.push(extra);
+                }
                 var wont_do = true;
                 if(activity_data != null)
                 {
                     wont_do = false;
                 }
                 var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString();
-                data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), "data": activity_data, "doactivity": !wont_do};
+                data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), "data": activity_data, "doactivity": wont_do};
                 console.log(data);
                 $.ajax({
                     type: "post",
@@ -288,14 +292,18 @@
         return elem;
     }
 
-    function generic(activity) {
+    function generic(activity, state) {
         var btn = 'Hoàn tất';
         var elem = 
         '<div class="generic-container">' +
             '<div class="activity-header">' +
                 '<p id="activity-title' + activity.id + '">Công việc (nhiệm vụ): ' + '<span>' + activity.name + '</span>' + '</p>' +
                 '<p id="activity-desc' + activity.id + '">Mô tả (hướng dẫn): ' + activity.description + '</p>' +
-                '<p id="activity-desc' + activity.id + '">Thời gian: ' + activity.duration + ' (giờ)</p>';
+                '<p id="activity-desc' + activity.id + '">Thời gian: ' + activity.duration + ' (giờ)</p>' +
+                '<input hidden value="Nguyễn Văn B" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
+                '<input hidden value="other" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
+                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Comment</a></div>' +
+                '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' ;
                 if(request.data != null)
                 {
                     elem += '<div class="activity-data">';
@@ -319,7 +327,8 @@
                     });
                     elem += '</div>';
                 }
-                elem += '<button class="btn btn-default" onclick="complete_task(' + activity.id + ')">' + btn + '</button>'
+                elem += '<button class="btn btn-success" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'approve\')">Phê duyệt</button>' +
+                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')">Từ chối</button>'
             '</div>' +
         '</div>';
         return elem;
@@ -352,7 +361,7 @@
                     state.activities.forEach(activity => {
                         switch (activity.activityType) {
                             case 3:
-                                elem += generic(activity);
+                                elem += generic(activity, state.name);
                                 break;
                             case 0:
                                 elem += email_template(activity);
