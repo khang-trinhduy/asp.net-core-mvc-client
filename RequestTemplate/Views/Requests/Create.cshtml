@@ -1,6 +1,6 @@
 <div class="request-area">
     <div id="request-title">
-        <label class="control-label">Flow: </label>
+        <label class="control-label">Tên quy trình: </label>
         <input id="request-name" type="text" class="form-control" placeholder="Tên quy trình"/>
         <span id="name-validation">Bắt buộc</span>
         <label class="control-label">Loại: </label>
@@ -26,7 +26,7 @@
             <i id="generic" class="fas fa-tasks" title="Thông thường"></i>
             <i id="absent" class="far fa-address-card" title="Nghỉ phép"></i>
             <i id="email" class="fas fa-envelope" title="Email"></i>
-            <i id="file" class="fas fa-file-upload" title="Upload file"></i>
+            <i id="fileulti" class="fas fa-file-upload" title="Upload file"></i>
             <i id="edit" class="far fa-edit" title="Chỉnh sửa"></i>
             <i id="comment" class="far fa-comment" title="Comment"></i>
             <div class="states-partial">
@@ -170,7 +170,7 @@
                             '</div>' +
                             '<div class="role-area"><span hidden>Đối tượng thực hiện:</span>' +
                                     '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
-                                        '<option selected value="hr">Bộ phận nhân sự</option>' +
+                                        '<option selected selected value="hr">Bộ phận nhân sự</option>' +
                                         '<option selected value="crm">Bộ phận nghiệp vụ</option>' +
                                         '<option value="other">Khác</option>' +
                                     '</select>' +
@@ -179,6 +179,7 @@
                 }
                 else{
                     alert("Chuyển loại quy trình sang \"Cần người thẩm định\" để tạo loại yêu cầu \"Vắng mặt\"");
+                    return '';
                 }
                 break;
             case 'EMAIL':
@@ -196,10 +197,13 @@
                                 '<select class="form-control" id="role-type' + id + '" multiple>' +
                                     '<option value="hr">Bộ phận nhân sự</option>' +
                                     '<option value="cm">Bộ phận nghiệp vụ</option>' +
-                                    '<option value="other">Khác</option>' +
+                                    '<option selected value="other">Khác</option>' +
                                 '</select>' +
                         '</div>' +
                     '</div>';
+                break;
+            case 'COMMENT':
+                return '';
                 break;
         }
         state_view += '</div>';

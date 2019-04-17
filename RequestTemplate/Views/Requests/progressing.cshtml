@@ -144,6 +144,7 @@
     var tasks = JSON.parse('@Html.Raw(Json.Serialize(Model.Tasks))');
     var request = JSON.parse('@Html.Raw(Json.Serialize(Model))');
     var current_state_id = request.currentState.id;
+    var random_name = ['Nguyễn Thị A', 'Trần Văn B', 'Nguyễn Duy C', 'Lê Văn D', 'Phạm Tấn F', 'Dương Thị G', 'Trương Ngọc H'];
     function slide(param) {
         $(param).next().slideToggle();
         
@@ -228,6 +229,11 @@
         });
     }
 
+    function get_random_name() {
+        var randomnumber = Math.floor(Math.random() * (random_name.length - 1 - 0 + 1)) + 0;
+        return random_name[randomnumber];
+    }
+
     function absent_template(activity, state) {
         var elem = 
         '<div class="absent-container">' +
@@ -235,12 +241,12 @@
                 '<div><span style="display: inline">Tên nhân viên: </span><p style="display:inline" id="activity-abse' + activity.id + '">' + activity.absentName + '</p></div>' +
                 '<div><span style="display: inline">Ngày xin nghỉ: </span><p style="display:inline" id="activity-dayo' + activity.id + '">' + activity.dayOff + '</p></div>' +
                 '<div><span style="display: inline">Lý do: </span><p style="display:inline" id="activity-reas' + activity.id + '">' + activity.reason + '</p></div>' +
-                '<input hidden value="Nguyễn Văn B" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
+                '<input hidden value="' + get_random_name() + '" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
                 '<input hidden value="hr" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
-                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Comment</a></div>' +
+                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Thêm nhận xét</a></div>' +
                 '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' +
-                '<i class="far fa-check-square" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\')" title="Cho phép"></i>' +
-                '<i class="far fa-times-circle" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')" title="Không cho phép"></i>' +
+                '<i class="far fa-check-square" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\')" title="Chấp nhận"></i>' +
+                '<i class="far fa-times-circle" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')" title="Từ chối"></i>' +
             '</div>' +
         '</div>';
         return elem;
@@ -297,12 +303,17 @@
         var elem = 
         '<div class="generic-container">' +
             '<div class="activity-header">' +
-                '<p id="activity-title' + activity.id + '">Công việc (nhiệm vụ): ' + '<span>' + activity.name + '</span>' + '</p>' +
-                '<p id="activity-desc' + activity.id + '">Mô tả (hướng dẫn): ' + activity.description + '</p>' +
-                '<p id="activity-desc' + activity.id + '">Thời gian: ' + activity.duration + ' (giờ)</p>' +
-                '<input hidden value="Nguyễn Văn B" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
+                '<p hidden id="activity-title' + activity.id + '">Công việc (nhiệm vụ): ' + '<span>' + activity.name + '</span>' + '</p>';
+                if (activity.description != null) {
+                    elem += '<p id="activity-desc' + activity.id + '">Mô tả (hướng dẫn): ' + activity.description + '</p>';
+                }
+                if (activity.duration > 0) {
+                    elem += '<p id="activity-desc' + activity.id + '">Thời gian: ' + activity.duration + ' (giờ)</p>';
+                }
+                elem +=
+                '<input hidden value="' + get_random_name() + '" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
                 '<input hidden value="other" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
-                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Comment</a></div>' +
+                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Thêm nhận xét</a></div>' +
                 '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' ;
                 if(request.data != null)
                 {
@@ -312,7 +323,7 @@
                         {
                             if(data.isReallyNotApproved == false)
                             {
-                                elem += '<div><p>Yêu cầu được thông qua bởi (' + data.approverName + ')</p></div>';
+                                elem += '<div><p>Yêu cầu được chấp nhận bởi (' + data.approverName + ')</p></div>';
                             }
                             else {
                                 elem += '<div><p>Yêu cầu bị từ chối bởi (' + data.approverName + ')</p></div>';
@@ -322,12 +333,12 @@
                         }
                         else if (data.dataType == 5)
                         {
-                            elem += '<div><p>' + data.messages + '</p></div>';
+                            elem += '<div><p>' + get_random_name() +': ' + data.messages + '</p></div>';
                         }
                     });
                     elem += '</div>';
                 }
-                elem += '<button class="btn btn-success" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'approve\')">Phê duyệt</button>' +
+                elem += '<button class="btn btn-success" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'approve\')">Chấp nhận</button>' +
                 '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')">Từ chối</button>'
             '</div>' +
         '</div>';
