@@ -1,13 +1,14 @@
 ﻿@model IEnumerable<RequestTemplate.Models.Request>
 
 @{
-    ViewData["Title"] = "Danh sách workflow";
+    ViewData["Title"] = "Danh sách quy trình đã tạo";
 }
 
 <h1>Danh sách workflow</h1>
 
 <div class="create">
-    <a asp-action="Create">Tạo workflow</a>
+    <a asp-action="Create">Tạo mới quy trình</a>
+    <label class="control-label"> hoặc chọn trong danh sách các quy trình đã tạo</label>
 </div>
 
 <div class="flow-main-page">
@@ -18,7 +19,7 @@
             </select>
         </div>
         <div id="select-flow">
-            <input id="btn-select-flow" type="button" value="Ok"/>
+            <input id="btn-select-flow" class="btn btn-primary" type="button" value="Ok"/>
         </div>
     </div>
     <div class="flow-page">

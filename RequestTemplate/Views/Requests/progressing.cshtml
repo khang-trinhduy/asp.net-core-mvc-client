@@ -135,6 +135,9 @@
     .activities li {
         display: inline-block;
     }
+    a:hover {
+        cursor: pointer;
+    }
 </style>
 
 <script>
@@ -245,8 +248,8 @@
                 '<input hidden value="hr" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
                 '<div><a style="display:block" onclick="slider(' + activity.id + ')">Thêm nhận xét</a></div>' +
                 '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' +
-                '<i class="far fa-check-square" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\')" title="Chấp nhận"></i>' +
-                '<i class="far fa-times-circle" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')" title="Từ chối"></i>' +
+                '<button class="btn btn-success" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\')" title="">Chấp nhận</button>' +
+                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')" title="">Từ chối</button>' +
             '</div>' +
         '</div>';
         return elem;

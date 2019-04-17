@@ -1,6 +1,10 @@
+@{
+    ViewData["Title"] = "Tạo quy trình";
+}
 <div class="request-area">
     <div id="request-title">
-        <label class="control-label">Tên quy trình: </label>
+        <h4>I. Tạo quy trình (bắt buộc)</h4>
+        <label class="control-label">Tên quy trình (bắt buộc): </label>
         <input id="request-name" type="text" class="form-control" placeholder="Tên quy trình"/>
         <span id="name-validation">Bắt buộc</span>
         <label class="control-label">Loại: </label>
@@ -37,21 +41,27 @@
 </div>
 <hr/>
 <div class="progress-page">
-    <label class="control-label">Sơ đồ</label>
+    <h4>II. Sắp xếp thứ tự thực hiện quy trình (bắt buộc)</h4>
+    <button class="btn btn-warning" id="btn-graph">Tạo mới</button>
     <div class="progress-area">
         
     </div>
 </div>
 <div class="transition-page">
+    <h4>III. Thêm điều kiện để quy trình rẽ nhánh (không bắt buộc)</h4>
+    <i>Nếu không thêm điều kiện, hệ thống sẽ tự động chuyển sang công việc tiếp theo dựa vào thứ tự đã được sắp xếp bên trên</i>
     <div class="transition-area">
+    <button class="btn btn-info" id="btn-condition">Thêm điều kiện</button>
         
     </div>
 </div>
+<hr/>
+
 <div class="submit-work-flow">
-    <button class="btn btn-warning" id="btn-graph">Tạo sơ đồ</button>
-    <button class="btn btn-info" id="btn-condition">Thêm điều kiện</button>
-    <button id="btn-submit" class="btn btn-default">Lưu lại</button>
+     <h4>IV. Hoàn tất tạo quy trình (bắt buộc)</h4>
+    <button id="btn-submit" class="btn btn-default">Lưu lại</button>    
 </div>
+
 <style>
     .far, .fas{
         margin-left: 10px;
@@ -59,6 +69,15 @@
         select {
             width: auto !important;
         }
+    .far:hover {
+        cursor: pointer;
+    }
+     .fas:hover {
+        cursor: pointer;         
+     }
+     a:hover {
+         cursor: pointer;
+     }
 </style>
 
 <script>
@@ -142,7 +161,7 @@
             '<input type="date" class="form-control" id="state-eta' + id +'" />' +
             '</div>' +
             '<div class="activity-area' + id + '">' +
-            '<label for="">Tên công việc: </label>';
+            '<label for="">Tên công việc (bắt buộc): </label>';
             
         switch (type) {
             case 'CONTACT':
@@ -158,17 +177,17 @@
                 if ($('#manual-proceed').is(':checked')) {
                     state_view += '<div class="absent-contents">' +
                             '<input type="text" class="form-control" placeholder="Tên công việc" id="activity-name' + id + '" value="Xin nghỉ phép">' +
-                            '<label hidden onclick="toggling()" class="control-label">Mô tả chi tiết</label>' +
+                            '<a hidden onclick="toggling()" class="control-label">Mô tả chi tiết</a>' +
                             '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '">' +
                             '<span hidden>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '" hidden value="1">' +
-                            '<label class="control-label">Tên nhân viên</label>' +
+                            '<label class="control-label">Tên nhân viên (bắt buộc): </label>' +
                             '<input type="text" class="form-control" placeholder="Tên nhân viên" id="activity-worker' + id + '" value="Nguyễn Văn A">' +
-                            '<label class="control-label">Ngày vắng mặt: </label> <input type="date" type="text" class="form-control" placeholder="Ngày vắng mặt" id="activity-off-day' + id + '">' +
-                            '<label class="control-label">Lý do</label>' + 
+                            '<label class="control-label">Ngày vắng mặt (bắt buộc): </label> <input type="date" type="text" class="form-control" placeholder="Ngày vắng mặt" id="activity-off-day' + id + '">' +
+                            '<label class="control-label">Lý do: </label>' + 
                             '<textarea class="form-control" placeholder="Lý do" rows="3" id="activity-reason' + id + '">Có việc gấp</textarea>' +
                             '<span hidden id="activity-type' + id + '">ABSENT</span>' + 
                             '</div>' +
-                            '<div class="role-area"><span hidden>Đối tượng thực hiện:</span>' +
+                            '<div class="role-area"><span hidden>Đối tượng thực hiện (chọn 1 hoặc nhiều):</span>' +
                                     '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
                                         '<option selected selected value="hr">Bộ phận nhân sự</option>' +
                                         '<option selected value="crm">Bộ phận nghiệp vụ</option>' +
@@ -188,12 +207,12 @@
             case 'GENERIC':
                 state_view += '<div class="generic-contents">' +
                         '<input type="text" class="form-control" placeholder="" id="activity-name' + id + '">' +
-                        '<div><label id="detail-label" onclick="toggling(this)" class="control-label">Mô tả chi tiết</label>' +
+                        '<div><a id="detail-label" onclick="toggling(this)" class="control-label">Mô tả chi tiết</a>' +
                         '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '"></div>' +
-                        '<label class="control-label" onclick="toggling(this)">Thời gian thực hiện công việc (giờ): </label> <input type="number" class="form-control" id="activity-dura' + id + '">' +
+                        '<a class="control-label" onclick="toggling(this)">Thời gian thực hiện công việc (giờ): </a> <input type="number" class="form-control" id="activity-dura' + id + '">' +
                         '<label hidden id="activity-type' + id + '">GENERIC</label>' + 
                         '</div>' +
-                        '<div class="role-area"><label class="control-label">Đối tượng thực hiện:</label>' +
+                        '<div class="role-area"><label class="control-label">Đối tượng thực hiện (chọn 1 hoặc nhiều):</label>' +
                                 '<select class="form-control" id="role-type' + id + '" multiple>' +
                                     '<option value="hr">Bộ phận nhân sự</option>' +
                                     '<option value="cm">Bộ phận nghiệp vụ</option>' +

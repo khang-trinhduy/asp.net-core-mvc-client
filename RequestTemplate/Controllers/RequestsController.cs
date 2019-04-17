@@ -116,7 +116,7 @@ namespace RequestTemplate.Controllers
 
                 if (result.IsSuccessStatusCode)
                 {
-                    return Json("Thao tác thành công");
+                    return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
                 }
                 return Json("Lỗi: không tìm thấy máy chủ");
             }
