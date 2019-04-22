@@ -12,6 +12,7 @@ namespace RequestTemplate.Models
         public string Title { get; set; }
         public string UserName { get; set; }
         public State CurrentState { get; set; }
+        public Node CurrentNode { get; set; }
         public DateTime DateRequested { get; set; }
         public List<ActivityLog> Histories { get; set; }
         public List<Task> Tasks { get; set; }
@@ -25,6 +26,8 @@ namespace RequestTemplate.Models
         public ICollection<TransitionRule> Rules { get; set; }
         public ICollection<Role> Roles { get; set; }
         public ICollection<Activity> Activities { get; set; }
+        public ICollection<Node> Nodes { get; set; }
+        public Node Root { get; set; }
     }
 
     public class ActivityLog
@@ -130,11 +133,26 @@ namespace RequestTemplate.Models
         public DateTime ETA { get; set; }
 
     }
+    public class Node
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public List<Activity> Activities { get; set; }
+        public List<Role> Roles { get; set; }
+        public Node Parent { get; set; }
+        public List<Node> Childs { get; set; }
+        public int Level { get; set; }
+        public bool IsCompleted { get; set; }
+        public List<Action> Actions { get; set; }
+    }
     public class TransitionRule
     {
         public State CurrentState { get; set; }
         public State NextState { get; set; }
         public Action Action { get; set; }
+        public Node CurrentNode { get; set; }
+        public Node NextNode { get; set; }
         public TransitionRule() { }
     }
     public class Role

@@ -45,9 +45,25 @@ namespace RequestTemplate.Models
         public int Id { get; set; }
         public ICollection<ActionViewModel> Actions { get; set; }
         public ICollection<StateViewModel> States { get; set; }
+        public ICollection<NodeViewModel> Nodes { get; set; }
         public ICollection<TransitionRuleViewModel> Rules { get; set; }
         public ICollection<RoleViewModel> Roles { get; set; }
         public ICollection<ActivityViewModel> Activities { get; set; }
+    }
+
+    public class NodeViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public List<NodeViewModel> Childs { get; set; }
+        public NodeViewModel Parent { get; set; }
+        public int Level { get; set; }
+        public bool IsCompleted { get; set; }
+        public List<ActivityViewModel> Activities { get; set; }
+        public List<RoleViewModel> Roles { get; set; }
+        public int ProcessId { get; set; }
+        public List<Action> Actions { get; set; }
     }
 
     public class ActivityViewModel
@@ -90,6 +106,8 @@ namespace RequestTemplate.Models
     {
         public string CurrentState { get; set; }
         public string NextState { get; set; }
+        public string CurrentNode { get; set; }
+        public string NextNode { get; set; }
         public int Id { get; set; }
         public string Action { get; set; }
     }

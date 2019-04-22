@@ -248,7 +248,134 @@ namespace RequestTemplate.Controllers
             {
                 return Json("Lỗi: không tìm thấy máy chủ");
             }
-            return Json("Yêu cầu đã được tạo thành công");
+            return Json("Yêu cầu đã được tạo thành công, click \"Trang chính\" để xem quy trình");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTree(RequestViewModel model)
+        {
+            if (model is null)
+            {
+                return Json("Lỗi: sai cấu hình dữ liệu");
+            }
+            Process new_process = new Process
+            {
+                Name = "test",
+                Actions = new List<Models.Action>(),
+                Nodes = new List<Node>(),
+                Activities = new List<Activity>(),
+                Roles = new List<Role>(),
+                Rules = new List<TransitionRule>()
+
+            };
+            if (model.Process.Nodes is null)
+            {
+                return Json("Lỗi: sai cấu trúc dữ liệu");
+            }
+            foreach (var node in model.Process.Nodes)
+            {
+                Node new_node = new Node
+                {
+                    Name = node.Name,
+                    Activities = new List<Activity>(),
+                    Description = node.Description,
+                    Level = node.Level,
+                    Roles = new List<Role>(),
+                    Actions = node.Actions,
+                    Childs = new List<Node>()
+                };
+                if (node.Childs != null) {
+                    foreach (var child in node.Childs)
+                    {
+                        Node new_child = new Node {
+                            Name = child.Name,
+                            Description = child.Description,
+                            Level = child.Level,
+                            Actions = child.Actions,
+                            Roles = new List<Role>(),
+                            Activities = new List<Activity>()
+                        };
+                        new_node.Childs.Add(new_child);
+                    }
+                }
+                if (node.Activities != null)
+                {
+                    foreach (var activity in node.Activities)
+                    {
+                        Activity new_activity = new Activity
+                        {
+                            ActivityType = activity.ActivityType,
+                            Name = activity.Name,
+                            Description = activity.Description,
+                            Roles = new List<Role>(),
+                            IsRequired = true,
+                            Duration = activity.Duration,
+                            Data = new List<Data>(),
+                            AbsentName = activity.AbsentName,
+                            ApproverName = activity.ApproverName,
+                            DayOff = activity.DayOff,
+                            IsReallyNotApproved = activity.IsReallyNotApproved,
+                            Reason = activity.Reason
+                        };
+                        if (activity.Roles != null)
+                        {
+                            foreach (var role in activity.Roles)
+                            {
+                                Role temp = new Role { Name = role.Name };
+                                new_activity.Roles.Add(temp);
+                                new_process.Roles.Add(temp);
+                            }
+                            new_node.Activities.Add(new_activity);
+
+                        }
+                        new_process.Activities.Add(new_activity);
+
+                    }
+                    new_process.Nodes.Add(new_node);
+                }
+
+            }
+            if (model.Process.Rules is null)
+            {
+                return Json("Lỗi: sai cấu trúc dữ liệu");
+            }
+            foreach (var action in model.Process.Actions)
+            {
+                var new_action = new Models.Action
+                {
+                    Name = action.Name,
+                    Description = action.Description
+                };
+                new_process.Actions.Add(new_action);
+            }
+            foreach (var rule in model.Process.Rules)
+            {
+                var new_rule = new TransitionRule
+                {
+                    Action = new_process.Actions.FirstOrDefault(a => a.Name == rule.Action),
+                    CurrentNode = new_process.Nodes.FirstOrDefault(s => s.Name == rule.CurrentNode),
+                    NextNode = new_process.Nodes.FirstOrDefault(s => s.Name == rule.NextNode)
+                };
+                new_process.Rules.Add(new_rule);
+            }
+            Models.Request new_request = new Request
+            {
+                CurrentNode = new_process.Nodes.FirstOrDefault(n => n.Level == 0),
+                Data = null,
+                Histories = null,
+                Process = new_process,
+                Tasks = null,
+                Title = model.Title,
+                UserName = "test user"
+            };
+            var client = new HttpClient();
+            var content = new StringContent(JsonConvert.SerializeObject(new_request), Encoding.UTF8, "application/json");
+            var result = await client.PostAsync("http://" + Configuration["url"] + ":88/api/v1/requests/tree/", content);
+            if (!result.IsSuccessStatusCode)
+            {
+                return Json("Lỗi: không tìm thấy máy chủ");
+            }
+            return Json("Yêu cầu đã được tạo thành công, click \"Trang chính\" để xem quy trình");
         }
 
         // POST: Requests/Create

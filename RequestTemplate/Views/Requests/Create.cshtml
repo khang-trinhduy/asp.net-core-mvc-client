@@ -16,6 +16,10 @@
             <input type="radio" id="manual-proceed" name="customRadio" class="custom-control-input">
             <label class="custom-control-label" for="manual-proceed">Cần người thẩm định</label>
         </div>
+        <div class="custom-control custom-radio">
+            <input type="radio" id="tree-proceed" name="customRadio" class="custom-control-input">
+            <label class="custom-control-label" for="tree-proceed">Quy trình dạng cây</label>
+        </div>
     </div>
 </div>
 
@@ -86,33 +90,75 @@
     var activities = [];
     var actions = ['approve', 'deny'];
     var cdt = 1;
+    var request = {};
     function generate_path() {
         $('.progress-area').html('');
-        
-        for (let i = 0; i < ids.length; i++) {
-            const cur = ids[i];
-            var next = cur + 1;
-            var activity = {};
-            activity['name'] = $('#activity-name' + cur.toString()).val();
-            var elem = '<select onchange="change(this,' + (i + 1).toString() +')" style="display: inline-block" class="form-control" id="state-graph' + (i + 1).toString() + '">';
-           
-            for (let j = 0; j < ids.length; j++) {
-                const ai = ids[j];
-                var name = $('#activity-name' + ai.toString()).val();
-                elem += '<option value="' + name + '">' + name + '</option>';
+        var tree = $('#tree-proceed').is(':checked');
+        if (!tree) {
+            for (let i = 0; i < ids.length; i++) {
+                const cur = ids[i];
+                var next = cur + 1;
+                var activity = {};
+                activity['name'] = $('#activity-name' + cur.toString()).val();
+                var elem = '<select onchange="change(this,' + (i + 1).toString() +')" style="display: inline-block" class="form-control" id="state-graph' + (i + 1).toString() + '">';
+            
+                for (let j = 0; j < ids.length; j++) {
+                    const ai = ids[j];
+                    var name = $('#activity-name' + ai.toString()).val();
+                    elem += '<option value="' + name + '">' + name + '</option>';
+                    
+                }
+                elem += '</select>';
+                if (i < ids.length - 1) {
+                    elem += '<div style="display:inline-block" class="path">'+
+                                '<p style="display:inline-block">-></p>' + 
+                            '</div>';
+                }
+                if (!activities.includes(activity.name)) {
+                    activities.push(activity.name);
+                }
+                $('.progress-area').append(elem);
+
+            }
+        }
+        else {
+            var elem = '';
+            for (let i = 0; i < ids.length - 1; i++) {
+                const cur = ids[i];
+                var next = cur + 1;
+                var activity = {};
+                activity['name'] = $('#activity-name' + cur.toString()).val();
+                elem += '<div><select style="display: inline-block" class="form-control" id="current-node' + (i + 1).toString() + '">';
                 
-            }
-            elem += '</select>';
-            if (i < ids.length - 1) {
-                elem += '<div style="display:inline-block" class="path">'+
-                            '<p style="display:inline-block">-></p>' + 
+                for (let j = 0; j < ids.length;j++) {
+                    const ai = ids[j];
+                    var name = $('#activity-name' + ai.toString()).val();
+                    elem += '<option value="' + name + '">' + name + '</option>';
+                }
+                elem += '</select><div style="display: inline-block" class="path">' + 
+                        '<p style="display:inline-block">--</p>' +
                         '</div>';
-            }
-            if (!activities.includes(activity.name)) {
-                activities.push(activity.name);
+                elem += '<input id="node-action' + (i + 1).toString() + '" class="form-control" placeholder="action" style="display:inline-block; width: auto" />';
+                if (i < ids.length - 1) {
+                    elem += '<div style="display: inline-block" class="path">' + 
+                        '<p style="display:inline-block">--></p>' +
+                        '</div>';
+                }
+                elem += '<select style="display: inline-block" class="form-control" id="next-node' + (i + 1).toString() + '">';
+                
+                for (let j = 0; j < ids.length;j++) {
+                    const ai = ids[j];
+                    var name = $('#activity-name' + ai.toString()).val();
+                    elem += '<option value="' + name + '">' + name + '</option>';
+                }
+                elem += '</select></div>';                
+                if (!activities.includes(activity.name)) {
+                    activities.push(activity.name);
+                }
             }
             $('.progress-area').append(elem);
         }
+        
     }
     function default_condition(params) {
         var new_elem = '<label style="display: inline-block" class="control-label">Điều kiện mặc định: </label>'
@@ -363,37 +409,61 @@
         rules['paths'] = [];
         rules['states'] = {};
         states = {};
-        for (let i = 0; i < ids.length; i++) {
-            const cur = ids[i];
-            rule = {};
-            var activity = $('#state-graph' + cur.toString()).val();
-            if (i < ids.length - 1)
-            {
+        var tree = $('#tree-proceed').is(':checked');
+        if (!tree) {
+            for (let i = 0; i < ids.length; i++) {
+                const cur = ids[i];
+                rule = {};
+                var activity = $('#state-graph' + cur.toString()).val();
+                if (i < ids.length - 1)
+                {
+                    
+                    if (activity == undefined) {
+                        return null;
+                    }
+                    rule['currentstate'] = activity;
+                    var next = cur + 1;
+                    rule['nextstate'] = $('#state-graph' + next.toString()).val();
+                    rule['action'] = 'approve';
+                    rules.paths.push(rule);
+                }
                 
-                if (activity == undefined) {
+                if (i == 0)
+                {
+                    rules.states['start'] = activity;
+                }
+                else if (i == ids.length - 1)
+                {
+                    rules.states['end'] = activity;
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < ids.length - 1; i++) {
+                const cur = ids[i];
+                rule = {};
+                var currentnode = $('#current-node' + cur.toString()).val();
+                var action = $('#node-action' + cur.toString()).val();
+                var nextnode = $('#next-node' + cur.toString()).val();
+                if (currentnode == undefined || nextnode == undefined) {
                     return null;
                 }
-                rule['currentstate'] = activity;
+                if (action == undefined || action == '') {
+                    return null;
+                }
+                console.log("tree");        
+                rule['nextnode'] = nextnode;
+                rule['currentnode'] = currentnode;
                 var next = cur + 1;
-                rule['nextstate'] = $('#state-graph' + next.toString()).val();
-                rule['action'] = 'approve';
+                rule['action'] = action;
                 rules.paths.push(rule);
-            }
-            
-            if (i == 0)
-            {
-                rules.states['start'] = activity;
-            }
-            else if (i == ids.length - 1)
-            {
-                rules.states['end'] = activity;
+                
             }
         }
         return rules;
     }
 
     $('#btn-submit').on('click', function (params) {
-        var request = {};
         var states = [];
         request['title'] = $('#request-name').val();
         if(request['title'] == undefined)
@@ -402,14 +472,18 @@
         }
         request['process'] = {};
         request['process']['states'] = [];
+        request['process']['nodes'] = [];
         request['process']['actions'] = [];
         request['process']['roles'] = [];
         request['process']['rules'] = [];
         request['process']['activities'] = [];
+        request['process']['root'] = [];
+        var root = null;
         var idns = document.querySelectorAll('[id]');
         var rules = null;
         var manual = $('#manual-proceed').is(':checked');
-        if (manual) {
+        var tree = $('#tree-proceed').is(':checked');
+        if (manual || tree) {
             rules = get_rule();
             console.log(rules);
         }
@@ -418,72 +492,114 @@
             alert("Chưa tạo sơ đồ");
             return;
         }
+        if (rules == null && tree)
+        {
+            alert("Chưa tạo sơ đồ");
+            return;
+        }
         for (let i = 1; i <= ids.length; i++) {
-            state = {};
             activity = {};
-
-            state['name'] = activity['name'] = $('#activity-name' + i.toString()).val();
-            activity['description'] = $('#activity-desc' + i.toString()).val();
-            activity['duration'] = $('#activity-dura' + i.toString()).val();
-            activity['activitytype'] = $('#activity-type' + i.toString()).text();
-            var roles =$('#role-type' + i.toString()).val();
-            activity['roles'] = [];
-            activity['absentname'] = $('#activity-worker' + i.toString()).val();
-            activity['dayoff'] = $('#activity-off-day' + i.toString()).val();
-            <!-- activity['isreallynotapproved'] = $('#activity-reason' + i.toString()).val(); -->
-            <!-- activity['approvername'] = $('#activity-worker' + i.toString()).val(); -->
-            activity['reason'] = $('#activity-reason' + i.toString()).val();
-            roles.forEach(element => {
-                if(!activity['roles'].some(e => e.name === element)) {
-                    activity['roles'].push({'name': element});
+            if (tree) {
+                node = {};
+                node['parent'] = '';
+                node['childs'] = [];
+                node['actions'] = [];
+                node['level'] = -1;
+                node['name'] = activity['name'] = $('#activity-name' + i.toString()).val();
+                node['description'] = activity['description'] = $('#activity-desc' + i.toString()).val();
+                activity['duration'] = $('#activity-dura' + i.toString()).val();
+                activity['activitytype'] = $('#activity-type' + i.toString()).text();
+                var roles =$('#role-type' + i.toString()).val();
+                activity['roles'] = [];
+                activity['absentname'] = $('#activity-worker' + i.toString()).val();
+                activity['dayoff'] = $('#activity-off-day' + i.toString()).val();
+                <!-- activity['isreallynotapproved'] = $('#activity-reason' + i.toString()).val(); -->
+                <!-- activity['approvername'] = $('#activity-worker' + i.toString()).val(); -->
+                activity['reason'] = $('#activity-reason' + i.toString()).val();
+                roles.forEach(element => {
+                    if(!activity['roles'].some(e => e.name === element)) {
+                        activity['roles'].push({'name': element});
+                    }
+                });
+                if (activity.roles.length <= 0) {
+                    alert('Chưa chọn đối tượng phụ trách công việc ' + activity.name);
+                    return;
                 }
-            });
-            state['eta'] = $('#state-eta' + i.toString()).val();
-            state['activities'] = [];
-            state['activities'].push(activity);
-            states.push(state.name);
-            
-            if (!manual) {
-                activities.push(activity.name);
-                if(i == 1)
-                {
-                    state['statetype'] = 'start';
-                }
-                else if(i == ids.length)
-                {
-                    state['statetype'] = 'end';                
-                }
-                else
-                {
-                    state['statetype'] = 'normal';   
-                }
+                node['activities'] = [];
+                node['activities'].push(activity);
+                
+                request['process']['nodes'].push(node);
             }
             else {
-                if(rules.states.start == state.name)
-                {
-                    state['statetype'] = 'start';
+                state = {};
+                state['name'] = activity['name'] = $('#activity-name' + i.toString()).val();
+                activity['description'] = $('#activity-desc' + i.toString()).val();
+                activity['duration'] = $('#activity-dura' + i.toString()).val();
+                activity['activitytype'] = $('#activity-type' + i.toString()).text();
+                var roles =$('#role-type' + i.toString()).val();
+                activity['roles'] = [];
+                activity['absentname'] = $('#activity-worker' + i.toString()).val();
+                activity['dayoff'] = $('#activity-off-day' + i.toString()).val();
+                <!-- activity['isreallynotapproved'] = $('#activity-reason' + i.toString()).val(); -->
+                <!-- activity['approvername'] = $('#activity-worker' + i.toString()).val(); -->
+                activity['reason'] = $('#activity-reason' + i.toString()).val();
+                roles.forEach(element => {
+                    if(!activity['roles'].some(e => e.name === element)) {
+                        activity['roles'].push({'name': element});
+                    }
+                });
+                if (activity.roles.length <= 0) {
+                    alert('Chưa chọn đối tượng phụ trách công việc ' + activity.name);
+                    return;
                 }
-                else if(rules.states.end == state.name)
-                {
-                    state['statetype'] = 'end';                
+                state['eta'] = $('#state-eta' + i.toString()).val();
+                state['activities'] = [];
+                state['activities'].push(activity);
+                states.push(state.name);
+                
+                if (!manual) {
+                    activities.push(activity.name);
+                    if(i == 1)
+                    {
+                        state['statetype'] = 'start';
+                    }
+                    else if(i == ids.length)
+                    {
+                        state['statetype'] = 'end';                
+                    }
+                    else
+                    {
+                        state['statetype'] = 'normal';   
+                    }
                 }
-                else
-                {
-                    state['statetype'] = 'normal';   
+                else {
+                    if(rules.states.start == state.name)
+                    {
+                        state['statetype'] = 'start';
+                    }
+                    else if(rules.states.end == state.name)
+                    {
+                        state['statetype'] = 'end';                
+                    }
+                    else
+                    {
+                        state['statetype'] = 'normal';   
+                    }
                 }
-            }
 
-            request['process']['states'].push(state);
+                request['process']['states'].push(state);
+            }
+            
         }
-        
-        if (!manual) {
+
+        if (!manual && !tree) {
             request['process']['actions'] = ['auto'];
             for (let index = 0; index < states.length - 1; index++) {
                 var rule = {'action': 'auto advance', 'currentstate': states[index], 'nextstate': states[index + 1]};
                 request['process']['rules'].push(rule);
             }
         }
-        else{
+        else if (manual) {
             rules.paths.forEach(path => {
                 if (!actions.includes(path.action)) {
                     actions.push(path.action);
@@ -511,26 +627,74 @@
                 }
             }
         }
+        if (tree) {
+            actions = [];
+            rules.paths.forEach(path => {
+                if (!actions.includes(path.action)) {
+                    actions.push(path.action);
+                }
+                node['actions'].push(path.action);
+                request['process']['rules'].push(path);
+                var p = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.name === path.currentnode)];
+                var c = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.name === path.nextnode)];
+                p.childs.push(c);
+            });
+            request['process']['nodes'].forEach(node => {
+                if (node.parent == null || node.parent == undefined || node.parent == '') {
+                    node.level = 0;
+                }
+                else {
+                    node.level = node.parent.level + 1;
+                }
+            });
+            root = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.level === 0)];
+            request.process.root = root
+        }
         actions.forEach(action => {
             request['process']['actions'].push({'name': action}) ;
         });
-        request['currentstate'] = request.process.states[request.process.states.findIndex(i => i.statetype === 'start')].name;
+        if (tree) {
+            request['currentnode'] = root.name;
+        }
+        else {
+            request['currentstate'] = request.process.states[request.process.states.findIndex(i => i.statetype === 'start')].name;
+        }
         console.log(request);
-        $.ajax({
-            type: "post",
-            url: '@Url.Action("create", "requests")',
-            data: request,
-            dataType: "json",
-            header: {
-                'content-type': 'application/json'
-            },
-            success: function (response) {
-                console.log(response);
-                alert(response);
-            },
-            error: function () {
-                console.log('error');              
-            }
-        });
+        if (tree) {
+            $.ajax({
+                type: "post",
+                url: '@Url.Action("createtree", "requests")',
+                data: request,
+                dataType: "json",
+                header: {
+                    'content-type': 'application/json'
+                },
+                success: function (response) {
+                    console.log(response);
+                    alert(response);
+                },
+                error: function () {
+                    console.log('error');
+                }
+            });
+        }
+        else {
+            $.ajax({
+                type: "post",
+                url: '@Url.Action("create", "requests")',
+                data: request,
+                dataType: "json",
+                header: {
+                    'content-type': 'application/json'
+                },
+                success: function (response) {
+                    console.log(response);
+                    alert(response);
+                },
+                error: function () {
+                    console.log('error');              
+                }
+            });
+        }
     });
 </script>
