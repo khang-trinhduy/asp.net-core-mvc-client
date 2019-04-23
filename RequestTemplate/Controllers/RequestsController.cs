@@ -102,7 +102,7 @@ namespace RequestTemplate.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> doSomething(int id, SubmitActionViewModel model)
+        public async Task<IActionResult> doSomething(int id, bool istree, SubmitActionViewModel model)
         {
             if (model is null)
             {
@@ -112,13 +112,23 @@ namespace RequestTemplate.Controllers
             try
             {
                 var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                var result = await client.PutAsync("http://" + Configuration["url"] + ":88/api/v1/requests/submitaction/" + id.ToString(), content);
-
-                if (result.IsSuccessStatusCode)
-                {
-                    return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
+                if (istree) {
+                    var result = await client.PutAsync("http://" + Configuration["url"] + ":88/api/v1/requests/submitnodeaction/" + id.ToString(), content);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
+                    }
+                    return Json("Lỗi: không tìm thấy máy chủ");
                 }
-                return Json("Lỗi: không tìm thấy máy chủ");
+                else {
+                    var result = await client.PutAsync("http://" + Configuration["url"] + ":88/api/v1/requests/submitaction/" + id.ToString(), content);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
+                    }
+                    return Json("Lỗi: không tìm thấy máy chủ");
+                }
+                
             }
             catch (System.Exception)
             {
@@ -284,20 +294,6 @@ namespace RequestTemplate.Controllers
                     Actions = node.Actions,
                     Childs = new List<Node>()
                 };
-                if (node.Childs != null) {
-                    foreach (var child in node.Childs)
-                    {
-                        Node new_child = new Node {
-                            Name = child.Name,
-                            Description = child.Description,
-                            Level = child.Level,
-                            Actions = child.Actions,
-                            Roles = new List<Role>(),
-                            Activities = new List<Activity>()
-                        };
-                        new_node.Childs.Add(new_child);
-                    }
-                }
                 if (node.Activities != null)
                 {
                     foreach (var activity in node.Activities)

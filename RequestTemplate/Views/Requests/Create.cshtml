@@ -633,18 +633,23 @@
                 if (!actions.includes(path.action)) {
                     actions.push(path.action);
                 }
-                node['actions'].push(path.action);
                 request['process']['rules'].push(path);
                 var p = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.name === path.currentnode)];
                 var c = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.name === path.nextnode)];
                 p.childs.push(c);
+                p.actions.push({"name": path.action});
+                c.parent = p.name;
             });
             request['process']['nodes'].forEach(node => {
                 if (node.parent == null || node.parent == undefined || node.parent == '') {
                     node.level = 0;
                 }
                 else {
-                    node.level = node.parent.level + 1;
+                    var parent = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.name == node.parent)];
+                    if (parent != null) {
+                        node.level = parent.level + 1;
+
+                    }
                 }
             });
             root = request['process']['nodes'][request['process']['nodes'].findIndex(i => i.level === 0)];
@@ -659,7 +664,7 @@
         else {
             request['currentstate'] = request.process.states[request.process.states.findIndex(i => i.statetype === 'start')].name;
         }
-        console.log(request);
+        <!-- console.log(request); -->
         if (tree) {
             $.ajax({
                 type: "post",

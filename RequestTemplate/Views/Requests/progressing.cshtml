@@ -143,10 +143,10 @@
 <script>
     var process = JSON.parse('@Html.Raw(Json.Serialize(Model.Process))');
     var states = process.states;
+    var nodes = process.nodes;
     var activities = process.activities;
     var tasks = JSON.parse('@Html.Raw(Json.Serialize(Model.Tasks))');
     var request = JSON.parse('@Html.Raw(Json.Serialize(Model))');
-    var current_state_id = request.currentState.id;
     var random_name = ['Nguyễn Thị A', 'Trần Văn B', 'Nguyễn Duy C', 'Lê Văn D', 'Phạm Tấn F', 'Dương Thị G', 'Trương Ngọc H'];
     function slide(param) {
         $(param).next().slideToggle();
@@ -169,7 +169,7 @@
             if (task.activity.id == id) {
                 var url = '@Url.Action("completetask", "requests")';
                 data = {"taskid": task.id, "isdone": false, "requestid": request.id, "autoadvance": "true"};
-                console.log(data);
+                // console.log(data);
                 $.ajax({
                     type: "post",
                     url: url,
@@ -210,8 +210,48 @@
                 {
                     wont_do = false;
                 }
-                var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString();
+                var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString() + '&istree=false';
                 data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), "data": activity_data, "doactivity": wont_do};
+                console.log(data);
+                $.ajax({
+                    type: "post",
+                    url: url,
+                    data: data,
+                    header: {
+                        "content-type": "application/json"
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        alert(response);
+                    },
+                    error: function (){
+                        alert('Bạn không có quyền thực hiện tác vụ này');
+                    }
+                });
+            }
+        });
+    }
+
+    function node_call_something(id,node,activity,action) {
+        tasks.forEach(task => {
+            if (task.activity.id == id) {
+                
+                var core_data = {"datatype": "TalentLeave", "absentname": $('#activity-abse' + id.toString()).text(), "approvername": $('#activity-appr' + id.toString()).val(), "dayoff": $('#activity-dayo' + id.toString()).text(), "reason": $('#activity-reas' + id.toString()).text(), "isdone": true, "isreallynotapproved": true};
+                var extra = {"datatype": "Comment", "messages": $('#activity-data' + id.toString()).val(), "emoji": "", "topic": "TL_AC"};
+                var activity_data = []
+                if (core_data.approvername != undefined && core_data.absentname != '') {
+                    activity_data.push(core_data);
+                }
+                if (extra.messages != '') {
+                    activity_data.push(extra);
+                }
+                var wont_do = true;
+                if(activity_data != null)
+                {
+                    wont_do = false;
+                }
+                var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString() + '&istree=true';
+                data = {"source": node, "role": $('#activity-role' + id.toString()).val(), "action": action, "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), "data": activity_data, "doactivity": wont_do};
                 console.log(data);
                 $.ajax({
                     type: "post",
@@ -347,6 +387,54 @@
         '</div>';
         return elem;
     }
+    function node_generic(activity, node, actions) {
+        var btn = 'Hoàn tất';
+        var elem = 
+        '<div class="generic-container">' +
+            '<div class="activity-header">' +
+                '<p hidden id="activity-title' + activity.id + '">Công việc (nhiệm vụ): ' + '<span>' + activity.name + '</span>' + '</p>';
+                if (activity.description != null) {
+                    elem += '<p id="activity-desc' + activity.id + '">Mô tả (hướng dẫn): ' + activity.description + '</p>';
+                }
+                if (activity.duration > 0) {
+                    elem += '<p id="activity-desc' + activity.id + '">Thời gian: ' + activity.duration + ' (giờ)</p>';
+                }
+                elem +=
+                '<input hidden value="' + get_random_name() + '" class="form-control" type="text" id="activity-appr' + activity.id + '" placeholder="Người thẩm định" />' +
+                '<input hidden value="other" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
+                '<div><a style="display:block" onclick="slider(' + activity.id + ')">Thêm nhận xét</a></div>' +
+                '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' ;
+                if(request.data != null)
+                {
+                    elem += '<div class="activity-data">';
+                    request.data.forEach(data => {
+                        if(data.dataType == 6)
+                        {
+                            if(data.isReallyNotApproved == false)
+                            {
+                                elem += '<div><p>Yêu cầu được chấp nhận bởi (' + data.approverName + ')</p></div>';
+                            }
+                            else {
+                                elem += '<div><p>Yêu cầu bị từ chối bởi (' + data.approverName + ')</p></div>';
+
+                            }
+                            btn = 'Xác nhận';
+                        }
+                        else if (data.dataType == 5)
+                        {
+                            elem += '<div><p>' + get_random_name() +': ' + data.messages + '</p></div>';
+                        }
+                    });
+                    elem += '</div>';
+                }
+                actions.forEach(action => {
+                    elem += '<button class="btn btn-success" onclick="node_call_something(' + activity.id +',\'' + node.trim() + '\',\'' + activity.name.trim() + '\',\'' + action + '\')">' + action + '</button>';
+                });
+                elem +=
+            '</div>' +
+        '</div>';
+        return elem;
+    }
 
     $(function () {
         var cpl = true;
@@ -359,48 +447,88 @@
         if(cpl) {
             $('#model-title').text(request.title + ' (đã hoàn thành)');
         }
-        states.forEach(state => {
-            var elem = '<li id="fader" class="event" data-date="' + state.eta +'">' +
-            '<div class="progress-state" onclick="slide(this)">';
-            if (state.id == current_state_id) {
-                elem += '<p id="progress-title' + state.id + '">' + state.name + ' <span>(trạng thái hiện tại)</span></p>';
-            }
-            else {
-                elem += '<p id="progress-title' + state.id + '">' + state.name + '</p>';
-            }
-            elem +=
-            '</div>' +
-            '<div class="progress-activities">' +
-                '<div class="activities">';
-                    state.activities.forEach(activity => {
-                        switch (activity.activityType) {
-                            case 3:
-                                elem += generic(activity, state.name);
-                                break;
-                            case 0:
-                                elem += email_template(activity);
-                                break;
-                            case 1:
-                                elem += '<label class="control-label">' + activity.name + '</label>';
-                                break;
-                            case 2:
-                                
-                                break;
-                            case 4:
-                                elem += absent_template(activity, state.name);
-                                break;
-                        
-                            default:
-                                elem += '<label class="control-label">' + activity.name + '</label>';
-                                break;
-                        }
-                    });
-                elem += '</div>' +
-            '</div>' +
-            '</li>';
-            $('.timeline').append(elem);         
-            $('.absent-contents > input').slideToggle();
-        });
+        if (states.length > 0) {
+            console.log("jump into state");
+            states.forEach(state => {
+                var elem = '<li id="fader" class="event" data-date="' + state.eta +'">' +
+                '<div class="progress-state" onclick="slide(this)">';
+                if (state.id == request.currentState.id) {
+                    elem += '<p id="progress-title' + state.id + '">' + state.name + ' <span>(trạng thái hiện tại)</span></p>';
+                }
+                else {
+                    elem += '<p id="progress-title' + state.id + '">' + state.name + '</p>';
+                }
+                elem +=
+                '</div>' +
+                '<div class="progress-activities">' +
+                    '<div class="activities">';
+                        state.activities.forEach(activity => {
+                            switch (activity.activityType) {
+                                case 3:
+                                    elem += generic(activity, state.name);
+                                    break;
+                                case 0:
+                                    elem += email_template(activity);
+                                    break;
+                                case 1:
+                                    elem += '<label class="control-label">' + activity.name + '</label>';
+                                    break;
+                                case 2:
+                                    
+                                    break;
+                                case 4:
+                                    elem += absent_template(activity, state.name);
+                                    break;
+                            
+                                default:
+                                    elem += '<label class="control-label">' + activity.name + '</label>';
+                                    break;
+                            }
+                        });
+                    elem += '</div>' +
+                '</div>' +
+                '</li>';
+                $('.timeline').append(elem);         
+                $('.absent-contents > input').slideToggle();
+            });
+
+        }
+        else if (nodes.length > 0) {
+            nodes.forEach(node => {
+                var actions = [];
+                node.actions.forEach(action => {
+                    actions.push(action.name);
+                });
+                var elem = '<li id="fader" class="event" data-date="">' +
+                '<div class="progress-state" onclick="slide(this)">';
+                if (node.id == request.currentNode.id) {
+                    elem += '<p id="progress-title' + node.id + '">' + node.name +' <span>(trạng thái hiện tại)</span></p>';
+                }
+                else {
+                    elem += '<p id="progress-title' + node.id + '">' + node.name + '</p>';
+                }
+                elem += 
+                '</div>' +
+                '<div class="progress-activities">' + 
+                    '<div class="activities">';
+                        node.activities.forEach(activity => {
+                            switch (activity.activityType) {
+                                case 3:
+                                    elem += node_generic(activity, node.name, actions);
+                                    break;
+                            
+                                default:
+                                    elem += '<label class="control-label">' + activity.name + '</label>';
+                                    break;
+                            }
+                        });
+                    elem += '</div>' +
+                '</div>' +
+                '</li>';
+                $('.timeline').append(elem);
+                $('.absent-contents > input').slideToggle();
+            });
+        }
         $('.progress-state').nextAll().slideToggle();
     });
 </script>
