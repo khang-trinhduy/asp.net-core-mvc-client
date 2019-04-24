@@ -20,6 +20,7 @@ namespace RequestTemplate.Models
     }
     public class Process
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public ICollection<Action> Actions { get; set; }
         public ICollection<State> States { get; set; }
@@ -32,6 +33,7 @@ namespace RequestTemplate.Models
 
     public class ActivityLog
     {
+        public int Id { get; set; }
         public string User { get; set; }
         public Activity Activity { get; set; }
         public bool IsCompleted { get; set; }
@@ -50,6 +52,7 @@ namespace RequestTemplate.Models
 
     public class Data
     {
+        public int Id { get; set; }
         public string From { get; set; }
         public string To { get; set; }
         public string Subject { get; set; }
@@ -111,8 +114,21 @@ namespace RequestTemplate.Models
         public string Discriminator { get; set; }
 
     }
+    public class NodeCreateModel
+    {
+        public int Id { get; set; }
+        public ActivityType ActivityType { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int Duration { get; set; }
+        public bool IsRequired { get; set; }
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+        public DateTime DayOff { get; set; }
+        public string Reason { get; set; }
+    }
     public class Action
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }
@@ -148,6 +164,7 @@ namespace RequestTemplate.Models
     }
     public class TransitionRule
     {
+        public int Id { get; set; }
         public State CurrentState { get; set; }
         public State NextState { get; set; }
         public Action Action { get; set; }
@@ -157,6 +174,7 @@ namespace RequestTemplate.Models
     }
     public class Role
     {
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 }

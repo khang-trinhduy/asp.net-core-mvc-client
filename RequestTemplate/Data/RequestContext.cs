@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RequestTemplate.Models;
 
 namespace RequestTemplate.Models
 {
@@ -9,14 +10,16 @@ namespace RequestTemplate.Models
         {
         }
 
-        public DbSet<RequestTemplate.Models.Request> Requests { get; set; }
-        public DbSet<Applicant> Applicants { get; set; }
-        public DbSet<WorkFlow> Flows { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             //modelBuilder.Entity<Request>().HasOne(src => src.FlowId).WithOne();
         }
+
+        public DbSet<RequestTemplate.Models.Node> Node { get; set; }
+
+        public DbSet<RequestTemplate.Models.NodeCreateModel> NodeCreateModel { get; set; }
+
+        public DbSet<RequestTemplate.Models.Role> Role { get; set; }
     }
 }

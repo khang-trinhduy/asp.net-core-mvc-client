@@ -49,7 +49,11 @@ namespace RequestTemplate.Controllers
             return View(data);
         }
 
-
+        [HttpGet]
+        public IActionResult CreateTask()
+        {
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> ChangeRequest(int? id)
@@ -372,100 +376,6 @@ namespace RequestTemplate.Controllers
                 return Json("Lỗi: không tìm thấy máy chủ");
             }
             return Json("Yêu cầu đã được tạo thành công, click \"Trang chính\" để xem quy trình");
-        }
-
-        // POST: Requests/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("Id,Name,Kind,FlowId,RequesterId,Contents,File0,File1,File2,File3,File4,StartDate,EndDate,CustomerName,Phone,Email,Product, ApplicantId")] Request request)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         HttpClient client = new HttpClient();
-        //         var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-        //         await client.PostAsync("http://10.3.242.44:88/api/v1/requests/", content);
-
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     return View(request);
-        // }
-
-        // GET: Requests/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var client = new HttpClient();
-            var request = JsonConvert.DeserializeObject<Models.Request>(await client.GetStringAsync("http://" + Configuration["url"] + ":88/api/v1/requests/" + id.ToString()));
-            if (request == null)
-            {
-                return NotFound();
-            }
-            return View(request);
-        }
-
-        // POST: Requests/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Kind,FlowId,RequesterId,Contents,File0,File1,File2,File3,File4,StartDate,EndDate, ApplicantId,CustomerName,Phone,Email,Product")] Request request)
-        {
-            if (id != request.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var client = new HttpClient();
-                string json = JsonConvert.SerializeObject(request);
-                var result = await client.PutAsync(new Uri("http://" + Configuration["url"] + ":88/api/v1/requests/" + id.ToString()), new StringContent(json, Encoding.UTF8, "application/json"));
-
-                if (result.IsSuccessStatusCode)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            return View(request);
-        }
-
-        // GET: Requests/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            HttpClient cl = new HttpClient();
-            var request = JsonConvert.DeserializeObject<Models.Request>(await cl.GetStringAsync("http://" + Configuration["url"] + ":88/api/v1/requests/" + id.ToString()));
-
-            if (request is null)
-            {
-                return NotFound();
-            }
-
-            return View(request);
-        }
-
-        // POST: Requests/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var request = await _context.Requests.FindAsync(id);
-            var client = new HttpClient();
-            var result = await client.DeleteAsync("http://" + Configuration["url"] + ":88/api/v1/requests/" + id.ToString());
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool RequestExists(int id)
-        {
-            return _context.Requests.Any(e => e.Id == id);
         }
     }
 }

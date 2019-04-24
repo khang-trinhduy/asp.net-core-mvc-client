@@ -1,0 +1,63 @@
+﻿@model RequestTemplate.Models.NodeCreateModel
+
+@{
+    ViewData["Title"] = "Tạo đầu việc";
+}
+
+<h1>Task</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateTask" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Tên đầu việc</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ActivityType" class="control-label">Loại</label>
+                <select asp-for="ActivityType" class="form-control">
+                    <option value="generic">Thường</option>
+                    <option value="absent">Xin nghỉ phép</option>
+                    <option value="email">Email</option>
+                </select>
+                <span asp-validation-for="ActivityType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Mô tả cách thực hiện</label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Duration" class="control-label">Thời gian thực hiện</label>
+                <input asp-for="Duration" class="form-control" />
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsRequired" /> Bắt buộc
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="DayOff" class="control-label">Ngày nghỉ</label>
+                <input asp-for="DayOff" class="form-control" />
+                <span asp-validation-for="DayOff" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Reason" class="control-label">Lý do xin nghỉ</label>
+                <input asp-for="Reason" class="form-control" />
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Tạo" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
