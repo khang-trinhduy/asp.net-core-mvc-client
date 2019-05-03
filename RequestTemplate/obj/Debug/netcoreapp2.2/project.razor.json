@@ -2779,6 +2779,11 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "Views\\Requests\\Dashboard.cshtml",
+      "TargetPath": "Views\\Requests\\Dashboard.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "Views\\Home\\Index.cshtml",
       "TargetPath": "Views\\Home\\Index.cshtml",
       "FileKind": "mvc"
@@ -2886,6 +2891,11 @@
     {
       "FilePath": "Areas\\Identity\\Pages\\Account\\LoginWith2fa.cshtml",
       "TargetPath": "Areas\\Identity\\Pages\\Account\\LoginWith2fa.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "Views\\Requests\\Details.cshtml",
+      "TargetPath": "Views\\Requests\\Details.cshtml",
       "FileKind": "mvc"
     },
     {

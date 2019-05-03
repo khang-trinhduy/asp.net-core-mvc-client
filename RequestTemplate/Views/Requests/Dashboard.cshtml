@@ -1,0 +1,17 @@
+@model IEnumerable<RequestTemplate.Models.Request>
+@foreach (var item in Model)
+{
+    <a asp-action="Details" asp-route=""></a>
+    <p>@item.Title</p>
+    @if (item.CurrentState != null) {
+        <p>( @item.CurrentState.Name )</p>
+    }
+    else {
+        <p>( @item.CurrentNode.Name )</p>
+    }
+    @foreach (var item1 in item.Tasks)
+    {
+        <p>@item1.Activity.Name</p>
+        
+    }
+}

@@ -80,3 +80,5 @@ C:\Users\trinh\source\repos\RequestTemplate\requesttemplate\obj\Debug\netcoreapp
 C:\Users\trinh\source\repos\RequestTemplate\requesttemplate\obj\Debug\netcoreapp2.2\Razor\Areas\Identity\Pages\_ViewStart.g.cshtml.cs
 C:\Users\trinh\source\repos\RequestTemplate\requesttemplate\obj\Debug\netcoreapp2.2\Razor\Views\Shared\_LoginPartial.g.cshtml.cs
 C:\Users\trinh\source\repos\RequestTemplate\RequestTemplate\obj\Debug\netcoreapp2.2\Razor\Views\Requests\Task.g.cshtml.cs
+C:\Users\trinh\source\repos\RequestTemplate\RequestTemplate\obj\Debug\netcoreapp2.2\Razor\Views\Requests\Dashboard.g.cshtml.cs
+C:\Users\trinh\source\repos\RequestTemplate\RequestTemplate\obj\Debug\netcoreapp2.2\Razor\Views\Requests\Details.g.cshtml.cs

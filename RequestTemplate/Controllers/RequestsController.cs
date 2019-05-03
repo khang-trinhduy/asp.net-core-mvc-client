@@ -52,6 +52,21 @@ namespace RequestTemplate.Controllers
         [HttpGet]
         public IActionResult CreateTask()
         {
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Dashboard()
+        {
+            var client = new HttpClient();
+            var content = await client.GetStringAsync("http://" + Configuration["url"] + ":88/api/v1/requests/tasks?role=hr");
+            List<Request> requests = JsonConvert.DeserializeObject<List<Request>>(content);
+            return View(requests);
+        }
+
+        [HttpPost]
+        public IActionResult Dashboard(Request r) {
             return View();
         }
 

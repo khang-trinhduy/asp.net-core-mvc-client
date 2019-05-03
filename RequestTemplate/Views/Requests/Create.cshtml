@@ -34,6 +34,7 @@
             <i id="generic" class="fas fa-tasks" title="Thông thường"></i>
             <i id="absent" class="far fa-address-card" title="Nghỉ phép"></i>
             <i id="email" class="fas fa-envelope" title="Email"></i>
+            <i id="contact" class="fas fa-user-plus" title="Contact"></i>
             <i id="fileulti" class="fas fa-file-upload" title="Upload file"></i>
             <i id="edit" class="far fa-edit" title="Chỉnh sửa"></i>
             <i id="comment" class="far fa-comment" title="Comment"></i>
@@ -43,7 +44,7 @@
         </div>
     </div>
 </div>
-<hr/>
+
 <div class="progress-page">
     <h4>II. Sắp xếp thứ tự thực hiện quy trình (bắt buộc)</h4>
     <button class="btn btn-warning" id="btn-graph">Tạo mới</button>
@@ -51,6 +52,7 @@
         
     </div>
 </div>
+<hr/>
 <div class="transition-page">
     <h4>III. Thêm điều kiện để quy trình rẽ nhánh (không bắt buộc)</h4>
     <i>Nếu không thêm điều kiện, hệ thống sẽ tự động chuyển sang công việc tiếp theo dựa vào thứ tự đã được sắp xếp bên trên</i>
@@ -90,6 +92,7 @@
     var activities = [];
     var actions = ['approve', 'deny'];
     var cdt = 1;
+    var cc = 0;
     var request = {};
     function generate_path() {
         $('.progress-area').html('');
@@ -156,9 +159,40 @@
                     activities.push(activity.name);
                 }
             }
+            cc = ids.length - 1;
+            // elem += '<input type="button" class="btn btn-info" value="Thêm nhánh" onclick="add_path(' + cc + ')"/>';
             $('.progress-area').append(elem);
         }
         
+    }
+    function add_path(i) {
+        i = cc;
+        var elem = '<div><select style="display: inline-block" class="form-control" id="current-node' + (i + 1).toString() + '">';
+        for (let j = 0; j < ids.length;j++) {
+            const ai = ids[j];
+            var name = $('#activity-name' + ai.toString()).val();
+            elem += '<option value="' + name + '">' + name + '</option>';
+        }
+        elem += '</select><div style="display: inline-block" class="path">' + 
+                '<p style="display:inline-block">--</p>' +
+                '</div>';
+        elem += '<input id="node-action' + (i + 1).toString() + '" class="form-control" placeholder="action" style="display:inline-block; width: auto" />';
+        if (i < ids.length - 1) {
+            elem += '<div style="display: inline-block" class="path">' + 
+                '<p style="display:inline-block">--></p>' +
+                '</div>';
+        }
+        elem += '<select style="display: inline-block" class="form-control" id="next-node' + (i + 1).toString() + '">';
+        
+        for (let j = 0; j < ids.length;j++) {
+            const ai = ids[j];
+            var name = $('#activity-name' + ai.toString()).val();
+            elem += '<option value="' + name + '">' + name + '</option>';
+        }
+        elem += '</select></div>';
+        cc++;
+        $('.progress-area').append(elem);
+        return;             
     }
     function default_condition(params) {
         var new_elem = '<label style="display: inline-block" class="control-label">Điều kiện mặc định: </label>'
@@ -211,6 +245,29 @@
             
         switch (type) {
             case 'CONTACT':
+                state_view += '<div class="contact-contents">' +
+                        '<input type="text" class="form-control" placeholder="Tên công việc" id="activity-name' + id + '" value="Add contact">' +
+                        '<a hidden class="control-label">Mô tả chi tiết</a>' +
+                        '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '">' +
+                        '<span hidden>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '" hidden value="1">' +
+                        '<label class="control-label">Họ & tên</label>' +
+                        '<input type="text" class="form-control" placeholder="Họ & tên" id="activity-cont' + id + '">' +
+                        '<label class="control-label>SĐT</label>' +
+                        '<input class="form-control" placeholder="SĐT" id="activity-numb' + id + '">' + 
+                        '<label class="control-label">Email</label>' +
+                        '<input class="form-control" placeholder="email" id="activity-emai' + id + '">' +
+                        '<label class="control-label">Tuổi</label>' +
+                        '<input class="form-control" placeholder="Tuổi" id="activity-age' + id + '">' +
+                        '<span hidden id="activity-type' + id + '">CONTACT</span>' +
+                        '</div>' +
+                        '<div class="role-area"><span hidden>Đối tượng thực hiện (chọn 1 hoặc nhiều): </span>' +
+                                    '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
+                                        '<option selected selected value="hr">Bộ phận nhân sự</option>' +
+                                        '<option selected value="crm">Bộ phận nghiệp vụ</option>' +
+                                        '<option value="other">Khác</option>' +
+                                    '</select>' +
+                            '</div>' +
+                        '<hr/></div>';
                 return '';
                 break;
             case 'FILEULTI':
@@ -240,7 +297,7 @@
                                         '<option value="other">Khác</option>' +
                                     '</select>' +
                             '</div>' +
-                        '</div>';
+                        '<hr/></div>';
                 }
                 else{
                     alert("Chuyển loại quy trình sang \"Cần người thẩm định\" để tạo loại yêu cầu \"Vắng mặt\"");
@@ -248,7 +305,28 @@
                 }
                 break;
             case 'EMAIL':
-                return '';
+                state_view += '<div class="email-container">' + 
+                    '<div class="email-header">' +
+                        '<label class="control-label" id="to">To: </label>  <input class="form-control" id="to" type="text" placeholder="" />' +
+                        '<a class="cbb">Cbb/Bb</a>' +
+                        '<div id="additional"><label class="control-label" class="to">Cbb: </label>  <input class="form-control" id="Cbb" type="text" placeholder="" /></div>' +
+                        '<label class="control-label" class="to">Bb: </label>  <input class="form-control" id="Bb" type="text" placeholder="" />' +
+                        '<label class="control-label" id="subject">Subject: </label><input class="form-control" id="subject" type="text" placeholder="" />' +
+                        '</div>' +
+                    '<div class="email-body">' +
+                        '<label class="control-label" id="email-content"></label><textarea class="form-control" rows="5" id="contents"></textarea>' +
+                    '</div>' +
+                    '<div class="email-attachment">' +
+                        '<label>Attachment</label>' +
+                    '</div>' +
+                    '<div class="email-action">' +
+                        '<i class="fas fa-paperclip " title="Đính kèm"></i>' +
+                        '<i class="far fa-image " title="Ảnh"></i>' +
+                        '<i class="far fa-laugh " title="Emoji"></i>' +
+                        '<i class="fas fa-link " title="Link"></i>' +
+                        '<div class="send"><i class="fab fa-telegram-plane " title="Gửi"></i></div>' +
+                    '</div>' +
+                '<hr/></div>';
                 break;
             case 'GENERIC':
                 state_view += '<div class="generic-contents">' +
@@ -265,7 +343,7 @@
                                     '<option selected value="other">Khác</option>' +
                                 '</select>' +
                         '</div>' +
-                    '</div>';
+                    '<hr/></div>';
                 break;
             case 'COMMENT':
                 return '';
@@ -370,14 +448,36 @@
                 }
                 break;
             case 'EMAIL':
-                
+                activity_view = '<div class="email-container">' + 
+                    '<div class="email-header">' +
+                        '<label class="control-label" id="to">To: </label>  <input class="form-control" id="to" type="text" placeholder="" />' +
+                        '<a class="cbb">Cbb/Bb</a>' +
+                        '<div id="additional"><label class="control-label" class="to">Cbb: </label>  <input class="form-control" id="Cbb" type="text" placeholder="" /></div>' +
+                        '<label class="control-label" class="to">Bb: </label>  <input class="form-control" id="Bb" type="text" placeholder="" />' +
+                        '<label class="control-label" id="subject">Subject: </label><input class="form-control" id="subject" type="text" placeholder="" />' +
+                        '</div>' +
+                    '<div class="email-body">' +
+                        '<label class="control-label" id="email-content"></label><textarea class="form-control" rows="5" id="contents"></textarea>' +
+                    '</div>' +
+
+                    '<div class="email-attachment">' +
+                        '<label>Attachment</label>' +
+                    '</div>' +
+                    '<div class="email-action">' +
+                        '<i class="fas fa-paperclip " title="Đính kèm"></i>' +
+                        '<i class="far fa-image " title="Ảnh"></i>' +
+                        '<i class="far fa-laugh " title="Emoji"></i>' +
+                        '<i class="fas fa-link " title="Link"></i>' +
+                        '<div class="send"><i class="fab fa-telegram-plane " title="Gửi"></i></div>' +
+                    '</div>' +
+                '</div>';
                 break;
             case 'GENERIC':
                 activity_view = '<div class="generic-contents">' +
                         '<input type="text" class="form-control" placeholder="Tên đầu việc" id="activity-name' + id + '">' +
                         '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '">' +
                         '<span>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '">' +
-                        '<span hidden id="activity-type' + id + '">GENERIC</span>' + 
+                        '<span hidden id="activity-type' + id + '">GENERIC</span>' +   
                         '</div>' +
                         '<div class="role-area">' +
                                 '<select class="form-control" id="role-type' + id + '" multiple>' +
@@ -391,7 +491,6 @@
                 
         }
         var elem = '.activity-area' + id.toString().charAt(0);
-        console.log(elem);
         $(elem).append(activity_view);
         // $('.selectpicker').selectpicker();
     }
@@ -439,8 +538,8 @@
             }
         }
         else {
-            for (let i = 0; i < ids.length - 1; i++) {
-                const cur = ids[i];
+            for (let i = 1; i <= cc; i++) {
+                const cur = i;
                 rule = {};
                 var currentnode = $('#current-node' + cur.toString()).val();
                 var action = $('#node-action' + cur.toString()).val();
