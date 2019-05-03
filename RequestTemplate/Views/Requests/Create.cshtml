@@ -35,6 +35,7 @@
             <i id="absent" class="far fa-address-card" title="Nghỉ phép"></i>
             <i id="email" class="fas fa-envelope" title="Email"></i>
             <i id="contact" class="fas fa-user-plus" title="Contact"></i>
+            <i id="campaign" class="fas fa-folder-plus" title="Chiến dịch"></i>
             <i id="fileulti" class="fas fa-file-upload" title="Upload file"></i>
             <i id="edit" class="far fa-edit" title="Chỉnh sửa"></i>
             <i id="comment" class="far fa-comment" title="Comment"></i>
@@ -244,21 +245,15 @@
             '<label for="">Tên công việc (bắt buộc): </label>';
             
         switch (type) {
-            case 'CONTACT':
-                state_view += '<div class="contact-contents">' +
-                        '<input type="text" class="form-control" placeholder="Tên công việc" id="activity-name' + id + '" value="Add contact">' +
-                        '<a hidden class="control-label">Mô tả chi tiết</a>' +
-                        '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '">' +
-                        '<span hidden>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '" hidden value="1">' +
-                        '<label class="control-label">Họ & tên</label>' +
-                        '<input type="text" class="form-control" placeholder="Họ & tên" id="activity-cont' + id + '">' +
-                        '<label class="control-label>SĐT</label>' +
-                        '<input class="form-control" placeholder="SĐT" id="activity-numb' + id + '">' + 
-                        '<label class="control-label">Email</label>' +
-                        '<input class="form-control" placeholder="email" id="activity-emai' + id + '">' +
-                        '<label class="control-label">Tuổi</label>' +
-                        '<input class="form-control" placeholder="Tuổi" id="activity-age' + id + '">' +
-                        '<span hidden id="activity-type' + id + '">CONTACT</span>' +
+            case 'CAMPAIGN':
+                state_view += '<div class="campaign-contents">' +
+                        '<input type="text" class="form-control" placeholder="Tên công việc" id="activity-name' + id + '" value="Add/Select a campaign">' +
+                        '<div><a id="detail-label" onclick="toggling(this)" class="control-label">Mô tả chi tiết</a>' +
+                        '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '"></div>' +
+                        '<a class="control-label" onclick="toggling(this)">Thời gian thực hiện công việc (giờ): </a> <input type="number" class="form-control" id="activity-dura' + id + '">' +
+                        '<div hidden style="display:block"><label class="control-label">Tên chiến dịch</label>' +
+                        '<input hidden class="form-control" id="activity-camp' + id + '" type="text">' +
+                        '<span hidden id="activity-type' + id + '">CAMPAIGN</span>' +
                         '</div>' +
                         '<div class="role-area"><span hidden>Đối tượng thực hiện (chọn 1 hoặc nhiều): </span>' +
                                     '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
@@ -268,7 +263,31 @@
                                     '</select>' +
                             '</div>' +
                         '<hr/></div>';
-                return '';
+                break;
+            case 'CONTACT':
+                state_view += '<div class="contact-contents">' +
+                        '<input type="text" class="form-control" placeholder="Tên công việc" id="activity-name' + id + '" value="Add contact">' +
+                        '<div><a id="detail-label" onclick="toggling(this)" class="control-label">Mô tả chi tiết</a>' +
+                        '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '"></div>' +
+                        '<a class="control-label" onclick="toggling(this)">Thời gian thực hiện công việc (giờ): </a> <input type="number" class="form-control" id="activity-dura' + id + '">' +
+                        '<div style="display:block"><label class="control-label">Họ & tên</label>' +
+                        '<input type="text" class="form-control" placeholder="Họ & tên" id="activity-cont' + id + '">' +
+                        '<label class="control-label">SĐT</label>' +
+                        '<input class="form-control" placeholder="SĐT" type="number" id="activity-numb' + id + '">' + 
+                        '<label class="control-label">Email</label>' +
+                        '<input class="form-control" placeholder="email" id="activity-emai' + id + '">' +
+                        '<label class="control-label">Tuổi</label>' +
+                        '<input type="number" min="1" class="form-control" placeholder="Tuổi" id="activity-age' + id + '">' +
+                        '<span hidden id="activity-type' + id + '">CONTACT</span>' +
+                        '</div></div>' +
+                        '<div class="role-area"><span hidden>Đối tượng thực hiện (chọn 1 hoặc nhiều): </span>' +
+                                    '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
+                                        '<option selected selected value="hr">Bộ phận nhân sự</option>' +
+                                        '<option selected value="crm">Bộ phận nghiệp vụ</option>' +
+                                        '<option value="other">Khác</option>' +
+                                    '</select>' +
+                            '</div>' +
+                        '<hr/></div>';
                 break;
             case 'FILEULTI':
                 return '';
@@ -402,98 +421,6 @@
         alert(new_id);
         $(new_id).toggle();
     }
-    function addActivity(id, type) {
-        console.log('jumped into addactivity');
-        console.log(type);
-        var new_id = id * 10 + ids[id-1];
-        ids[id-1]++;
-        add_activity(new_id, type);
-        // $('.selectpicker').selectpicker();
-    }
-    function add_activity(type) {
-        var activity_view = '';
-        switch (type) {
-            case 'CONTACT':
-                
-                break;
-            case 'FILEULTI':
-                
-                break;
-            case 'EDIT':
-                
-                break;
-            case 'ABSENT':
-                if ($('#manual-proceed').is(':checked')) {
-                    activity_view = '<div class="absent-contents">' +
-                            '<input hidden type="text" class="form-control" placeholder="Tên đầu việc" id="activity-name' + id + '" value="Xin nghỉ phép">' +
-                            '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '" hidden value="">' +
-                            '<span hidden>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '" hidden value="1">' +
-                            '<input type="text" class="form-control" placeholder="Tên nhân viên" id="activity-worker' + id + '" value="Nguyễn Văn A">' +
-                            '<span>Ngày vắng mặt: </span> <input type="date" type="text" class="form-control" placeholder="Ngày vắng mặt" id="activity-off-day' + id + '">' +
-                            '<textarea class="form-control" placeholder="Lý do" rows="3" id="activity-reason' + id + '">Có việc gấp</textarea>' +
-                            '<span hidden id="activity-type' + id + '">ABSENT</span>' + 
-                            '</div>' +
-                            '<div class="role-area"><span hidden>Đối tượng thực hiện:</span>' +
-                                    '<select hidden class="form-control" id="role-type' + id + '" multiple>' +
-                                        '<option selected value="hr">Bộ phận nhân sự</option>' +
-                                        '<option selected value="crm">Bộ phận nghiệp vụ</option>' +
-                                        '<option value="other">Khác</option>' +
-                                    '</select>' +
-                            '</div>' +
-                        '</div>';
-                }
-                else{
-                    alert("Chuyển loại quy trình sang \"Cần người thẩm định\" để tạo loại yêu cầu \"Vắng mặt\"");
-                    activity_view = '';
-                }
-                break;
-            case 'EMAIL':
-                activity_view = '<div class="email-container">' + 
-                    '<div class="email-header">' +
-                        '<label class="control-label" id="to">To: </label>  <input class="form-control" id="to" type="text" placeholder="" />' +
-                        '<a class="cbb">Cbb/Bb</a>' +
-                        '<div id="additional"><label class="control-label" class="to">Cbb: </label>  <input class="form-control" id="Cbb" type="text" placeholder="" /></div>' +
-                        '<label class="control-label" class="to">Bb: </label>  <input class="form-control" id="Bb" type="text" placeholder="" />' +
-                        '<label class="control-label" id="subject">Subject: </label><input class="form-control" id="subject" type="text" placeholder="" />' +
-                        '</div>' +
-                    '<div class="email-body">' +
-                        '<label class="control-label" id="email-content"></label><textarea class="form-control" rows="5" id="contents"></textarea>' +
-                    '</div>' +
-
-                    '<div class="email-attachment">' +
-                        '<label>Attachment</label>' +
-                    '</div>' +
-                    '<div class="email-action">' +
-                        '<i class="fas fa-paperclip " title="Đính kèm"></i>' +
-                        '<i class="far fa-image " title="Ảnh"></i>' +
-                        '<i class="far fa-laugh " title="Emoji"></i>' +
-                        '<i class="fas fa-link " title="Link"></i>' +
-                        '<div class="send"><i class="fab fa-telegram-plane " title="Gửi"></i></div>' +
-                    '</div>' +
-                '</div>';
-                break;
-            case 'GENERIC':
-                activity_view = '<div class="generic-contents">' +
-                        '<input type="text" class="form-control" placeholder="Tên đầu việc" id="activity-name' + id + '">' +
-                        '<input type="text" class="form-control" placeholder="Mô tả nội dung công việc" id="activity-desc' + id + '">' +
-                        '<span>Thời gian thực hiện công việc (giờ): </span> <input type="number" class="form-control" id="activity-dura' + id + '">' +
-                        '<span hidden id="activity-type' + id + '">GENERIC</span>' +   
-                        '</div>' +
-                        '<div class="role-area">' +
-                                '<select class="form-control" id="role-type' + id + '" multiple>' +
-                                    '<option value="hr">Bộ phận nhân sự</option>' +
-                                    '<option value="cm">Bộ phận nghiệp vụ</option>' +
-                                    '<option value="other">Khác</option>' +
-                                '</select>' +
-                        '</div>' +
-                    '</div>';
-                break;
-                
-        }
-        var elem = '.activity-area' + id.toString().charAt(0);
-        $(elem).append(activity_view);
-        // $('.selectpicker').selectpicker();
-    }
     $('#name-validation').toggle();
     $('.state-icon>i').on('click', function () {
         $('.states-partial').append(createstate(curId + 1, $(this).attr('id').toUpperCase()));
@@ -615,6 +542,7 @@
                 <!-- activity['isreallynotapproved'] = $('#activity-reason' + i.toString()).val(); -->
                 <!-- activity['approvername'] = $('#activity-worker' + i.toString()).val(); -->
                 activity['reason'] = $('#activity-reason' + i.toString()).val();
+                activity['campaign']
                 roles.forEach(element => {
                     if(!activity['roles'].some(e => e.name === element)) {
                         activity['roles'].push({'name': element});

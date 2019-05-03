@@ -217,7 +217,9 @@ namespace RequestTemplate.Controllers
                             ApproverName = activity.ApproverName,
                             DayOff = activity.DayOff,
                             IsReallyNotApproved = activity.IsReallyNotApproved,
-                            Reason = activity.Reason
+                            Reason = activity.Reason,
+                            CampaignName = activity.CampaignName,
+                            IsRunning = activity.IsRunning
                         };
                         if (activity.Roles != null)
                         {
@@ -330,7 +332,9 @@ namespace RequestTemplate.Controllers
                             ApproverName = activity.ApproverName,
                             DayOff = activity.DayOff,
                             IsReallyNotApproved = activity.IsReallyNotApproved,
-                            Reason = activity.Reason
+                            Reason = activity.Reason,
+                            CampaignName = activity.CampaignName,
+                            IsRunning = activity.IsRunning
                         };
                         if (activity.Roles != null)
                         {

@@ -74,6 +74,21 @@ namespace RequestTemplate.Models
         public bool IsReallyNotApproved { get; set; }
         public bool IsDone { get; set; }
         public string ApproverName { get; set; }
+        public string CampaignName { get; set; }
+        public bool IsRunning { get; set; }
+        public List<ContactViewModel> Subscribers { get; set; }
+        public int Age { get; set; }
+        public string FullName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class ContactViewModel
+    {
+        public string FullName { get; set; }
+        public int Age { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
     }
 
     public enum DataType{
@@ -83,7 +98,9 @@ namespace RequestTemplate.Models
         Others = 3,
         Email = 4,
         Comment = 5,
-        TalentLeave = 6
+        TalentLeave = 6,
+        Campaign = 7,
+        Contact = 8
     }
 
     public enum ActivityType
@@ -92,7 +109,9 @@ namespace RequestTemplate.Models
         Call = 1,
         Upload = 2,
         Generic = 3,
-        Absent = 4
+        Absent = 4,
+        Contact = 5,
+        Campaign = 6
     }
 
     public class Activity
@@ -111,6 +130,9 @@ namespace RequestTemplate.Models
         public bool IsReallyNotApproved { get; set; }
         public string ApproverName { get; set; }
         public string Reason { get; set; }
+        public string CampaignName { get; set; }
+        public bool IsRunning { get; set; }
+        public List<ContactViewModel> Subscribers { get; set; }
         public string Discriminator { get; set; }
 
     }

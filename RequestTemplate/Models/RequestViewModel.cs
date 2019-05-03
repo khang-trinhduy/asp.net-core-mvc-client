@@ -82,6 +82,8 @@ namespace RequestTemplate.Models
         public string ApproverName { get; set; }
         public string Reason { get; set; }
         public string Discriminator { get; set; }
+        public bool IsRunning { get; set; }
+        public string CampaignName { get; set; }
 
     }
     public class ActionViewModel
