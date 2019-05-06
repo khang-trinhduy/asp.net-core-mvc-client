@@ -320,7 +320,7 @@ namespace RequestTemplate.Controllers
             {
                 return Json("Lỗi: không tìm thấy máy chủ");
             }
-            return Json("Yêu cầu đã được tạo thành công, click \"Trang chính\" để xem quy trình");
+            return Json(new_request);
         }
 
         [HttpPost]
