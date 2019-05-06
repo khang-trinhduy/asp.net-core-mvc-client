@@ -61,6 +61,7 @@ namespace RequestTemplate.Controllers
         public IActionResult StartCampaign(int id, string campaign)
         {
             var camp = campaigns.FirstOrDefault(c => c.Name.Equals(campaign));
+
             if (camp is null)
             {
                 return NotFound();

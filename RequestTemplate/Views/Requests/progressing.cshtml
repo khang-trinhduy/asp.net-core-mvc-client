@@ -312,7 +312,7 @@
         return elem;
     }
 
-    function start_campaign(params) {
+    function start_campaign(param) {
         var campaign = $('#activity-camp' + param.toString()).val();
         var url = '@Url.Action("StartCampaign", "requests")' + '?id=' + param.toString() + '&campaign=' + campaign;
         $.ajax({
