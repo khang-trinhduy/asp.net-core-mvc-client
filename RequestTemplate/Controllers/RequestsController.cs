@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -20,6 +21,9 @@ namespace RequestTemplate.Controllers
     {
         private readonly RequestContext _context;
         public IConfiguration Configuration { get; }
+        public int MyProperty { get; set; }
+        public List<Campaign> campaigns;
+        public List<Contact> contacts;
 
         public RequestsController(RequestContext context, IConfiguration configuration)
         {
@@ -27,6 +31,10 @@ namespace RequestTemplate.Controllers
             //client.BaseAddress = new Uri("http://" + Configuration["url"] + ":88/api/v1/requests");
             _context = context;
             Configuration = configuration;
+            StreamReader rd = new StreamReader("campaign.json");
+            List<Campaign> campaigns = JsonConvert.DeserializeObject<List<Campaign>>(rd.ReadToEnd());
+            StreamReader rd1 = new StreamReader("contact.json");
+            List<Contact> contacts = JsonConvert.DeserializeObject<List<Contact>>(rd1.ReadToEnd());
         }
 
         // GET: Requests
@@ -47,6 +55,17 @@ namespace RequestTemplate.Controllers
             }
             ViewBag.flows = flows;
             return View(data);
+        }
+
+        [HttpPost]
+        public IActionResult StartCampaign(int id, string campaign)
+        {
+            var camp = campaigns.FirstOrDefault(c => c.Name.Equals(campaign));
+            if (camp is null)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
 
         [HttpGet]
@@ -252,6 +271,25 @@ namespace RequestTemplate.Controllers
                 };
                 new_process.Actions.Add(new_action);
             }
+            var trigger = new Trigger {
+                Consequence = new Consequence {
+                    Method = "AddContact",
+                    Name = "Campaign"
+                },
+                Events = new List<Event> {
+                    new Event {
+                        Conditions = new List<Condition> {
+                            new Condition {
+                                Operator = "GreaterOrEqual",
+                                Param = "Age",
+                                Threshold = "18",
+                                Type = "Integer"
+                            }
+                        },
+                        Name = "Must be 18 or above to enter this campaign"
+                    }
+                }
+            };
             foreach (var rule in model.Process.Rules)
             {
                 var new_rule = new TransitionRule
@@ -260,6 +298,9 @@ namespace RequestTemplate.Controllers
                     CurrentState = new_process.States.FirstOrDefault(s => s.Name == rule.CurrentState),
                     NextState = new_process.States.FirstOrDefault(s => s.Name == rule.NextState)
                 };
+                if (new_rule.CurrentState.Activities[0].ActivityType == ActivityType.Campaign) {
+                    new_rule.Trigger = trigger;
+                }
                 new_process.Rules.Add(new_rule);
             }
             Models.Request new_request = new Request
@@ -394,7 +435,7 @@ namespace RequestTemplate.Controllers
             {
                 return Json("Lỗi: không tìm thấy máy chủ");
             }
-            return Json("Yêu cầu đã được tạo thành công, click \"Trang chính\" để xem quy trình");
+            return Json(new_request);
         }
     }
 }

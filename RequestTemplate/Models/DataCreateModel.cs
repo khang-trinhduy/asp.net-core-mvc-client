@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using RequestTemplate.Models;
 
 namespace RequestTemplate.Models.SubmitActionViewModel
@@ -29,5 +30,12 @@ namespace RequestTemplate.Models.SubmitActionViewModel
         public bool IsReallyNotApproved { get; set; }
         public bool IsDone { get; set; }
         public string ApproverName { get; set; }
+        public string CampaignName { get; set; }
+        public List<ContactViewModel> Subscribers { get; set; }
+        public bool IsRunning { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public int Age { get; set; }
     }
 }

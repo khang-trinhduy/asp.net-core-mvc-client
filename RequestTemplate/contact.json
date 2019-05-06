@@ -1,0 +1,38 @@
+[
+    {
+        "FullName": "Nguyễn Văn A",
+        "Age": 18,
+        "PhoneNumber": "0903333111",
+        "Email": "nva@gmail.com"
+    },
+    {
+        "FullName": "Nguyễn Văn b",
+        "Age": 19,
+        "PhoneNumber": "0903333111",
+        "Email": "nvbgmail.com"
+    },
+    {
+        "FullName": "Nguyễn Văn C",
+        "Age": 20,
+        "PhoneNumber": "0903333111",
+        "Email": "nvc@gmail.com"
+    },
+    {
+        "FullName": "Nguyễn Văn D",
+        "Age": 21,
+        "PhoneNumber": "0903333111",
+        "Email": "nvd@gmail.com"
+    },
+    {
+        "FullName": "Nguyễn Văn E",
+        "Age": 22,
+        "PhoneNumber": "0903333111",
+        "Email": "nve@gmail.com"
+    },
+    {
+        "FullName": "Nguyễn Văn F",
+        "Age": 17,
+        "PhoneNumber": "0903333111",
+        "Email": "nvf@gmail.com"
+    }
+]

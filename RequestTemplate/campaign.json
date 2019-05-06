@@ -1,0 +1,14 @@
+[
+    {
+        "Name": "Campaign 1",
+        "IsRunning": false
+    },
+    {
+        "Name": "Campaign 2",
+        "IsRunning": false
+    },
+    {
+        "Name": "Campaign 3",
+        "IsRunning": false
+    }
+]

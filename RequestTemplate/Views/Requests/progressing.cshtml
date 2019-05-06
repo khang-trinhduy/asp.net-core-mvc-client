@@ -1,6 +1,7 @@
 @model RequestTemplate.Models.Request
 @{
     Model.Process.States = Model.Process.States.OrderBy(s => s.Id).ToList();
+    Model.Process.Nodes = Model.Process.Nodes.OrderBy(n => n.Id).ToList();
     Model.Process.Activities = Model.Process.Activities.OrderBy(a => a.Id).ToList();
 }
 
@@ -295,6 +296,42 @@
         return elem;
     }
 
+    function campaign_template(activity, state) {
+        var elem =
+        '<div class="campaign-container">' +
+            '<div class="campaign-contents">' +
+                '<label class="control-label">Chiến dịch</label>' +
+                '<select class="form-control" id="activity-camp' + activity.id + '">' +
+                '<option value="c1">Campaign 1</option>' +
+                '<option value="c2">Campaign 2</option>' +
+                '<option value="c3">Campaign 3</option>' +
+                '</select>' +
+                '<input type="button" value="Start" onclick="start_campaign(' + activity.id + ')" class="btn btn-info" />' +
+            '</div>' +
+        '</div>';
+        return elem;
+    }
+
+    function start_campaign(params) {
+        var campaign = $('#activity-camp' + param.toString()).val();
+        var url = '@Url.Action("StartCampaign", "requests")' + '?id=' + param.toString() + '&campaign=' + campaign;
+        $.ajax({
+            type: "post",
+            url: url,
+            data: null,
+            header: {
+                "content-type": "application/json"
+            },
+            success: function (response) {
+                console.log(response);
+                alert(response);
+            },
+            error: function (){
+                alert('Bạn không có quyền thực hiện tác vụ này');
+            }
+        });
+    }
+
     function slider(id){
         $("#activity-data" + id.toString()).slideToggle();
     }
@@ -479,7 +516,9 @@
                                 case 4:
                                     elem += absent_template(activity, state.name);
                                     break;
-                            
+                                case 6:
+                                    elem += campaign_template(activity, state.name);
+                                    break;
                                 default:
                                     elem += '<label class="control-label">' + activity.name + '</label>';
                                     break;

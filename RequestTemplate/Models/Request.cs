@@ -83,6 +83,37 @@ namespace RequestTemplate.Models
         public string Email { get; set; }
     }
 
+    public class Trigger
+    {
+        public int Id { get; set; }
+        public Data Data { get; set; }
+        public ICollection<Event> Events { get; set; }
+        public Consequence Consequence { get; set; }
+    }
+
+    public class Consequence
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Method { get; set; }
+    }
+
+    public class Event
+    {
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public List<Condition> Conditions { get; set; }
+    }
+
+    public class Condition
+    {
+        public int Id { get; set; }
+        public string Param { get; set; }
+        public string Operator { get; set; }
+        public string Threshold { get; set; }
+        public string Type { get; set; }
+    }
+
     public class ContactViewModel
     {
         public string FullName { get; set; }
@@ -192,6 +223,7 @@ namespace RequestTemplate.Models
         public Action Action { get; set; }
         public Node CurrentNode { get; set; }
         public Node NextNode { get; set; }
+        public Trigger Trigger { get; set; }
         public TransitionRule() { }
     }
     public class Role

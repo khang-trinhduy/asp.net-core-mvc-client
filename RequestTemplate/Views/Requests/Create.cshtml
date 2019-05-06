@@ -49,6 +49,7 @@
 <div class="progress-page">
     <h4>II. Sắp xếp thứ tự thực hiện quy trình (bắt buộc)</h4>
     <button class="btn btn-warning" id="btn-graph">Tạo mới</button>
+    <button class="btn btn-info" onclick="add_trigger()">Thêm trigger</button>
     <div class="progress-area">
         
     </div>
@@ -95,6 +96,10 @@
     var cdt = 1;
     var cc = 0;
     var request = {};
+    var activate_trigger = false;
+    function add_trigger() {
+        activate_trigger = true;
+    }
     function generate_path() {
         $('.progress-area').html('');
         var tree = $('#tree-proceed').is(':checked');
@@ -640,7 +645,10 @@
                     var another_rule = {};
                     another_rule['action'] = $('#select-acti' + i.toString()).val();                     
                     another_rule['currentstate'] = $('#select-cond' + i.toString()).val();                     
-                    another_rule['nextstate'] = $('#select-answ' + i.toString()).val();    
+                    another_rule['nextstate'] = $('#select-answ' + i.toString()).val();
+                    if (activate_trigger) {
+                        another_rule['trigger'] = {"consequence": {"name": "campaign", "method": "subscribe"}, "events": [{"condition": {"param": "age", "operator": "ge", "threshold": "18", "type": "integer"}, "name": "campaign"}]};
+                    }
                     var is_not_duplicated = true;
                     for (let index = 0; index < request['process']['rules'].length; index++) {
                         const rule = request['process']['rules'][index];
@@ -691,7 +699,7 @@
         else {
             request['currentstate'] = request.process.states[request.process.states.findIndex(i => i.statetype === 'start')].name;
         }
-        <!-- console.log(request); -->
+        console.log(request);
         if (tree) {
             $.ajax({
                 type: "post",
