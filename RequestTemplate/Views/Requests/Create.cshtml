@@ -267,6 +267,37 @@
                                         '<option value="other">Khác</option>' +
                                     '</select>' +
                             '</div>' +
+                        '<div class="trigger-area">' +
+                            '<label class="control-label">Trigger for:</label>' +
+                            '<select class="form-control" id="trigger-cons' + id + '">' +
+                                '<option selected selected value="campaign">campaign</option>' +
+                                '<option value="other">Khác</option>' +
+                            '</select>' +
+                            '<label class="control-label">To:</label>' +
+                            '<select class="form-control" id="trigger-meth' + id + '">' +
+                                '<option selected selected value="startcampaign">start a campaign</option>' +
+                            '</select>' +
+                            '<div class="condition-area">' +
+                                '<label>Conditions:</label>' +
+                                '<div class="events" style="display: inline-block">' +
+                                    '<label class="control-label" style="display: inline-block; width: auto">On: </label>' +
+                                    '<select class="form-control" id="trigger-even' + id + '" style="display: inline-block">' +
+                                        '<option selected selected value="contact">Contact</option>' +
+                                        '<option value="other">Khác</option>' +
+                                    '</select>' + 
+                                    '<label class="control-label" style="display: inline-block; width: auto">If: </label>' +
+                                    '<select class="form-control" id="trigger-para' + id + '" style="display: inline-block">' +
+                                        '<option selected selected value="age">Age</option>' +
+                                        '<option value="other">Khác</option>' +
+                                    '</select>' + 
+                                    '<select class="form-control" id="trigger-oper' + id + '" style="display: inline-block">' +
+                                        '<option selected selected value="greaterorequal">>=</option>' +
+                                        '<option value="lesserorequal"><=</option>' +
+                                    '</select>' + 
+                                    '<input style="display:inline-block" type="text" class="form-control" id="trigger-thre' + id +'">' + 
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
                         '<hr/></div>';
                 break;
             case 'CONTACT':
