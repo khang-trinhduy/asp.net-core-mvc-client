@@ -189,7 +189,7 @@
         });
     }
 
-    function call_something(id,state,activity,action) {
+    function call_something(id,state,activity,action,trigger) {
         tasks.forEach(task => {
             if (task.activity.id == id) {
                 var isreallynotapproved = false;
@@ -206,13 +206,23 @@
                 if (extra.messages != '') {
                     activity_data.push(extra);
                 }
+                var _trigger = false;
+                var new_trigger = {};
+                if (trigger) {
+                    var rules = process.rules;
+                    var t = rules.find(r => r.currentState.name == state).trigger;
+                    new_trigger = t;
+                    _trigger = true;
+                }
                 var wont_do = true;
                 if(activity_data != null)
                 {
                     wont_do = false;
                 }
-                var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString() + '&istree=false';
-                data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), "data": activity_data, "doactivity": wont_do};
+                var url = '@Url.Action("dosomething", "requests")' + '?id=' + request.id.toString() + '&istree=false&trigger=' + _trigger;
+                data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, 
+                    "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), 
+                    "data": activity_data, "doactivity": wont_do, "trigger": new_trigger};
                 console.log(data);
                 $.ajax({
                     type: "post",
@@ -289,8 +299,8 @@
                 '<input hidden value="hr" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
                 '<div><a style="display:block" onclick="slider(' + activity.id + ')">Thêm nhận xét</a></div>' +
                 '<input class="form-control" type="text" id="activity-data' + activity.id + '" placeholder="Message" />' +
-                '<button class="btn btn-success" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\')" title="">Chấp nhận</button>' +
-                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')" title="">Từ chối</button>' +
+                '<button class="btn btn-success" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\',\'false\')" title="">Chấp nhận</button>' +
+                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\',\'false\')" title="">Từ chối</button>' +
             '</div>' +
         '</div>';
         return elem;
@@ -306,7 +316,7 @@
                 '<option value="c2">Campaign 2</option>' +
                 '<option value="c3">Campaign 3</option>' +
                 '</select>' +
-                '<input type="button" value="Start" onclick="start_campaign(' + activity.id + ')" class="btn btn-info" />' +
+                '<button class="btn btn-success" onclick="call_something('+ activity.id +',\''+state.trim()+ '\',\'' + activity.name.trim() + '\',\'approve\',\'true\')" title="">Chấp nhận</button>' +
             '</div>' +
         '</div>';
         return elem;
@@ -418,8 +428,8 @@
                     });
                     elem += '</div>';
                 }
-                elem += '<button class="btn btn-success" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'approve\')">Chấp nhận</button>' +
-                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\')">Từ chối</button>'
+                elem += '<button class="btn btn-success" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'approve\',\'false\')">Chấp nhận</button>' +
+                '<button class="btn btn-danger" onclick="call_something(' + activity.id +',\'' + state.trim() + '\',\'' + activity.name.trim() + '\',\'deny\',\'false\')">Từ chối</button>'
             '</div>' +
         '</div>';
         return elem;

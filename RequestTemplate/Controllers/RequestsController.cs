@@ -141,7 +141,7 @@ namespace RequestTemplate.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> doSomething(int id, bool istree, SubmitActionViewModel model)
+        public async Task<IActionResult> doSomething(int id, bool istree, bool trigger, SubmitActionViewModel model)
         {
             if (model is null)
             {
@@ -160,7 +160,11 @@ namespace RequestTemplate.Controllers
                     return Json("Lỗi: không tìm thấy máy chủ");
                 }
                 else {
-                    var result = await client.PutAsync("http://" + Configuration["url"] + ":88/api/v1/requests/submitaction/" + id.ToString(), content);
+                    if (trigger) {
+
+                    }
+                    var result = await client.PutAsync("http://" + Configuration["url"] +
+                         ":88/api/v1/requests/submitaction/" + id.ToString(), content);
                     if (result.IsSuccessStatusCode)
                     {
                         return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
