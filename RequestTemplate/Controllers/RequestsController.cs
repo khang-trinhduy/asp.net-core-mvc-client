@@ -58,10 +58,10 @@ namespace RequestTemplate.Controllers
         }
 
         [HttpPost]
-        public IActionResult StartCampaign(int id, string campaign)
+        public IActionResult StartCampaign(int id, string campaign, Trigger t)
         {
             var camp = campaigns.FirstOrDefault(c => c.Name.Equals(campaign));
-
+            
             if (camp is null)
             {
                 return NotFound();
