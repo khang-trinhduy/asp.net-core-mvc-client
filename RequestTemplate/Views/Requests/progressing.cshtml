@@ -223,7 +223,6 @@
                 data = {"source": state, "role": $('#activity-role' + id.toString()).val(), "action": action, 
                     "activity": activity, "approver": $('#activity-appr' + id.toString()).val(), 
                     "data": activity_data, "doactivity": wont_do, "trigger": new_trigger};
-                console.log(data);
                 $.ajax({
                     type: "post",
                     url: url,
@@ -310,6 +309,7 @@
         var elem =
         '<div class="campaign-container">' +
             '<div class="campaign-contents">' +
+                '<input hidden value="hr" class="form-control" type="text" id="activity-role' + activity.id + '" placeholder="Thuộc bộ phận" />' +
                 '<label class="control-label">Chiến dịch</label>' +
                 '<select class="form-control" id="activity-camp' + activity.id + '">' +
                 '<option value="c1">Campaign 1</option>' +

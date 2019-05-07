@@ -150,8 +150,8 @@ namespace RequestTemplate.Controllers
             var client = new HttpClient();
             try
             {
-                var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                 if (istree) {
+                    var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var result = await client.PutAsync("http://" + Configuration["url"] + ":88/api/v1/requests/submitnodeaction/" + id.ToString(), content);
                     if (result.IsSuccessStatusCode)
                     {
@@ -161,15 +161,33 @@ namespace RequestTemplate.Controllers
                 }
                 else {
                     if (trigger) {
+                        model.data = new List<DataCreateModel> {
+                            new DataCreateModel {
+                                CampaignName = "Campaign ",
+                                IsRunning = false,
+                                DataType = DataType.Campaign
+                            }
+                        };
+                        var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                        var result = await client.PutAsync("http://" + Configuration["url"] +
+                            ":88/api/v1/requests/submitaction/" + id.ToString() + "?trigger=true", content);
+                        if (result.IsSuccessStatusCode)
+                        {
+                            return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
+                        }
+                        return Json(model);
+                    }
+                    else {
+                        var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                        var result = await client.PutAsync("http://" + Configuration["url"] +
+                            ":88/api/v1/requests/submitaction/" + id.ToString() + "?trigger=false", content);
+                        if (result.IsSuccessStatusCode)
+                        {
+                            return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
+                        }
+                        return Json("Lỗi: không tìm thấy máy chủ");
 
                     }
-                    var result = await client.PutAsync("http://" + Configuration["url"] +
-                         ":88/api/v1/requests/submitaction/" + id.ToString(), content);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        return Json("Thao tác thành công, click \"Ok\" để load lại quy trình");
-                    }
-                    return Json("Lỗi: không tìm thấy máy chủ");
                 }
                 
             }
