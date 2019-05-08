@@ -87,7 +87,7 @@
          cursor: pointer;
      }
 </style>
-
+//TODO read trigger configuration
 <script>
     var ids = [];
     var curId = 0;
@@ -97,8 +97,32 @@
     var cc = 0;
     var request = {};
     var activate_trigger = false;
-    function add_trigger() {
+    var config_url = "https://10.3.236.232:443/api/v1/requests/triggerconfig";
+    var trigger_configuration = {};
+    $(function (){ //FIXME cannot read json file from config_url
+        $.getJSON(config_url, function(data) {
+            trigger_configuration = JSON.parse(data);
+        });
+    });
+    function add_trigger(id) { /*TODO get id to add trigger*/
         activate_trigger = true;
+        if (trigger_configuration == null) {
+            alert("cannot read configuration file, make sure that url { " + config_url + " } is valid");
+        }
+        var options = [];
+        trigger_configuration.forEach(element => {
+            options.push(element.name);
+        });
+        var for = add_select("Trigger for", "trigger-for" + id.toString(), options); /*TODO append to trigger-content*/
+    }
+    function add_select(name, id, options) { /*TODO add function to append new select*/
+        var elem = '<label class="control-label">' + name + '</label>' +
+                        '<select id="' + id + '" class="form-control">';
+        otions.forEach(option => {
+            elem += '<option value="' + option + '">' + option + '</option>';
+        });
+        elem += '</select>';
+        return elem;
     }
     function generate_path() {
         $('.progress-area').html('');
@@ -273,11 +297,16 @@
                                 '<option selected selected value="campaign">campaign</option>' +
                                 '<option value="other">Khác</option>' +
                             '</select>' +
+                            '<label class="control-label">Trigger event:</label>' +
+                            '<select class="form-control" id="trigger-cons' + id + '">' +
+                                '<option selected selected value="campaign">campaign</option>' +
+                                '<option value="other">Khác</option>' +
+                            '</select>' +
                             '<label class="control-label">To:</label>' +
                             '<select class="form-control" id="trigger-meth' + id + '">' +
-                                '<option selected selected value="startcampaign">start a campaign</option>' +
+                                '<option selected selected value="startcampaign">Automatical</option>' +
                             '</select>' +
-                            '<div class="condition-area">' +
+                            '<div class="condition-area">' +   
                                 '<label>Conditions:</label>' +
                                 '<div class="events" style="display: inline-block">' +
                                     '<label class="control-label" style="display: inline-block; width: auto">On: </label>' +

@@ -1,0 +1,83 @@
+[{
+    "name": "campaign",
+    "event": [{
+            "name": "start"
+        },
+        {
+            "name": "stop"
+        },
+        {
+            "name": "end"
+        },
+        {
+            "name": "update"
+        }
+    ],
+    "action": [{
+            "name": "send email"
+        },
+        {
+            "name": "subscribe"
+        },
+        {
+            "name": "unsubscribe"
+        }
+    ],
+    "target": [{
+        "name": "contact",
+        "condition": [{
+                "param": "age",
+                "operator": [{
+                        "name": ">="
+                    },
+                    {
+                        "name": "<="
+                    },
+                    {
+                        "name": ">"
+                    },
+                    {
+                        "name": "<"
+                    },
+                    {
+                        "name": "="
+                    }
+                ],
+                "type": "integer"
+            },
+            {
+                "param": "email",
+                "operator": [{
+                        "name": "!="
+                    },
+                    {
+                        "name": "=="
+                    }
+                ],
+                "type": "string"
+            },
+            {
+                "param": "phonenumber",
+                "operator": [{
+                        "name": "!="
+                    },
+                    {
+                        "name": "=="
+                    }
+                ],
+                "type": "string"
+            },
+            {
+                "param": "fullname",
+                "operator": [{
+                        "name": "!="
+                    },
+                    {
+                        "name": "=="
+                    }
+                ],
+                "type": "string"
+            }
+        ]
+    }]
+}]
